@@ -1,67 +1,46 @@
-Title:AniCare-Allacapan: A Web-Based LGU Rice Assistance and Market Program
+Title: AniCare-Allacapan: A Web-Based LGU Rice Assistance and Market Program
 
-Builder:
+Builder/Creator:
 PURISIMA, JOFFREY T.
 QUILANG, MARVIN T.
 OSILLOS, MIA NOREEN B.
 
+Overview
 
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+ANI-CARE ALLACAPAN is a web-based system designed to help the Local Government Unit (LGU) of Allacapan manage its rice assistance and local market operations in a more organized, efficient, and transparent way.
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Before this system, most of the processes were done manually using paper-based records. This often caused delays, errors in data entry, duplication of records, and difficulty in tracking beneficiaries and inventory. Because of these issues, decision-making became slower, especially during urgent situations like disasters or high-demand distribution periods.
 
-## About Laravel
+The ANI-CARE system was developed to solve these problems by providing a centralized platform where all transactions, records, and reports can be managed in real time.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Purpose of the System
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+The main goal of ANI-CARE ALLACAPAN is to improve the efficiency of rice distribution and market monitoring within the LGU. It aims to:
 
-## Learning Laravel
+1. Replace manual and paper-based processes with a digital system
+2. Provide accurate and real-time data for better decision-making
+3. Ensure fair and transparent distribution of rice assistance
+4. Reduce human errors and duplication of records
+5. Improve coordination between LGU staff and external users
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Technologies Used
 
-## Laravel Sponsors
+The system is built using modern web technologies such as:
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+Frontend: HTML, CSS, Bootstrap
+Backend:  PHP / Laravel
+Database: MySQL
+Web Server: Localhost / Online Hosting
 
-### Premium Partners
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+Future Improvements
 
-## Contributing
+Although ANI-CARE ALLACAPAN is already functional, future enhancements may include:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+1. Integration with mobile applications
+2. SMS or email notifications for beneficiaries
+3. Advanced analytics and dashboards
+4. Integration with other LGU systems
+5. Stronger cybersecurity features such as multi-factor authentication
