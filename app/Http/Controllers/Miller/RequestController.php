@@ -45,7 +45,7 @@ class RequestController extends Controller
         return view('miller.requests', compact('requests', 'status'));
     }
 
-    public function approve($id)
+    public function approve(int $id)
     {
         $this->requireMiller();
 
@@ -57,7 +57,7 @@ class RequestController extends Controller
         return back()->with('success', 'Request approved.');
     }
 
-    public function accept($id)
+    public function accept(int $id)
     {
         $this->requireMiller();
 
@@ -72,7 +72,7 @@ class RequestController extends Controller
         return back()->with('success', 'Assigned request accepted.');
     }
 
-    public function reject($id)
+    public function reject(int $id)
     {
         $this->requireMiller();
 
@@ -84,7 +84,7 @@ class RequestController extends Controller
         return back()->with('success', 'Request rejected.');
     }
 
-    public function complete($id)
+    public function complete(int $id)
     {
         $this->requireMiller();
 

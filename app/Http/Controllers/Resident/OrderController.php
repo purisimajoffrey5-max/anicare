@@ -38,7 +38,7 @@ class OrderController extends Controller
         return view('resident.orders', compact('user', 'orders'));
     }
 
-    public function show($id)
+    public function show(int $id)
     {
         $this->requireResident();
 
@@ -102,7 +102,7 @@ class OrderController extends Controller
         ));
     }
 
-    public function showCheckout($id)
+    public function showCheckout(int $id)
     {
         $this->requireResident();
 
@@ -116,7 +116,7 @@ class OrderController extends Controller
         return view('resident.checkout', compact('user', 'product'));
     }
 
-    public function placeOrder(Request $request, $id)
+    public function placeOrder(Request $request, int $id)
     {
         $this->requireResident();
 
@@ -216,3 +216,4 @@ class OrderController extends Controller
         ]);
     }
 }
+

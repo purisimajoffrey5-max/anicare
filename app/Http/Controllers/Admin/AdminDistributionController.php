@@ -66,7 +66,7 @@ class AdminDistributionController extends Controller
         return redirect()->route('admin.distribution')->with('success', 'Distribution record saved.');
     }
 
-    public function schedule(Request $request, $id)
+    public function schedule(Request $request, int $id)
     {
         $distribution = Distribution::findOrFail($id);
         $data = $request->validate([
@@ -80,7 +80,7 @@ class AdminDistributionController extends Controller
         return back()->with('success', 'Distribution scheduled.');
     }
 
-    public function complete($id)
+    public function complete(int $id)
     {
         $distribution = Distribution::findOrFail($id);
 
@@ -121,3 +121,5 @@ class AdminDistributionController extends Controller
         return back()->with('success', 'Distribution marked as completed and rice stock updated.');
     }
 }
+
+

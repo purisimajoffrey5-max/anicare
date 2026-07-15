@@ -27,7 +27,7 @@ class NotificationController extends Controller
         return view('miller.notifications', compact('notifications'));
     }
 
-    public function markAsRead(Request $request, $id)
+    public function markAsRead(Request $request, int $id)
     {
         $this->requireMiller();
 
@@ -38,3 +38,4 @@ class NotificationController extends Controller
         return back()->with('success', 'Notification marked as read');
     }
 }
+

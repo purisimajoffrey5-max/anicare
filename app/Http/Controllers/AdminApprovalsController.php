@@ -55,7 +55,7 @@ class AdminApprovalsController extends Controller
         ));
     }
 
-    public function approve($id)
+    public function approve(int $id)
     {
         $user = User::whereIn('role', ['resident', 'farmer', 'miller'])->findOrFail($id);
 
@@ -66,7 +66,7 @@ class AdminApprovalsController extends Controller
         return back()->with('success', 'User approved successfully.');
     }
 
-    public function revoke($id)
+    public function revoke(int $id)
     {
         $user = User::whereIn('role', ['resident', 'farmer', 'miller'])->findOrFail($id);
 

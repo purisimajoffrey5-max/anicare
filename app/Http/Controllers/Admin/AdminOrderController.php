@@ -23,7 +23,7 @@ class AdminOrderController extends Controller
         }
     }
 
-    public function showCheckout($id)
+    public function showCheckout(int $id)
     {
         $this->requireAdmin();
 
@@ -37,7 +37,7 @@ class AdminOrderController extends Controller
         return view('admin.checkout', compact('user', 'product'));
     }
 
-    public function placeOrder(Request $request, $id)
+    public function placeOrder(Request $request, int $id)
     {
         $this->requireAdmin();
 
@@ -154,3 +154,5 @@ class AdminOrderController extends Controller
             ->with('success', 'Order placed successfully! Status: PENDING');
     }
 }
+
+

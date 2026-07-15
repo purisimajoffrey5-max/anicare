@@ -48,7 +48,7 @@ class AnnouncementController extends Controller
     }
 
     // ✅ TAPOS NA (archive)
-    public function archive($id)
+    public function archive(int $id)
     {
         $this->requireAdmin();
 
@@ -71,7 +71,7 @@ class AnnouncementController extends Controller
         return view('admin.announcements.library', compact('archived'));
     }
 
-    public function restore($id)
+    public function restore(int $id)
     {
         $this->requireAdmin();
 
@@ -84,7 +84,7 @@ class AnnouncementController extends Controller
     }
 
     // optional permanent delete (library)
-    public function destroy($id)
+    public function destroy(int $id)
     {
         $this->requireAdmin();
 

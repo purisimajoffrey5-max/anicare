@@ -57,7 +57,7 @@ class AdminFarmersMillersController extends Controller
         ));
     }
 
-    public function show($id)
+    public function show(int $id)
     {
         $this->requireAdmin();
 
@@ -65,7 +65,7 @@ class AdminFarmersMillersController extends Controller
         return view('admin.farmers_millers_show', compact('user'));
     }
 
-    public function destroy($id)
+    public function destroy(int $id)
     {
         $this->requireAdmin();
 

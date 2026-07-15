@@ -65,7 +65,7 @@ class RiceProductController extends Controller
         return redirect()->route('farmer.products.index')->with('success', 'Product posted!');
     }
 
-    public function toggle($id)
+    public function toggle(int $id)
     {
         $this->requireFarmer();
         $user = Auth::user();
@@ -77,7 +77,7 @@ class RiceProductController extends Controller
         return back()->with('success', 'Product status updated.');
     }
 
-    public function outOfStock($id)
+    public function outOfStock(int $id)
     {
         $this->requireFarmer();
         $user = Auth::user();
@@ -90,7 +90,7 @@ class RiceProductController extends Controller
         return back()->with('success', 'Product marked as out of stock.');
     }
 
-    public function restock(Request $request, $id)
+    public function restock(Request $request, int $id)
     {
         $this->requireFarmer();
         $user = Auth::user();
@@ -109,7 +109,7 @@ class RiceProductController extends Controller
         return back()->with('success', 'Product stock updated.');
     }
 
-    public function destroy($id)
+    public function destroy(int $id)
     {
         $this->requireFarmer();
         $user = Auth::user();
@@ -125,3 +125,4 @@ class RiceProductController extends Controller
         return back()->with('success', 'Product deleted.');
     }
 }
+

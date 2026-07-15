@@ -26,7 +26,7 @@ class NotificationController extends Controller
         return view('admin.notifications', compact('notifications'));
     }
 
-    public function markAsRead(Request $request, $id)
+    public function markAsRead(Request $request, int $id)
     {
         $this->requireAdmin();
 
@@ -40,3 +40,4 @@ class NotificationController extends Controller
         return back()->with('success', 'Notification marked as read.');
     }
 }
+

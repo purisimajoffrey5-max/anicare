@@ -26,7 +26,7 @@ class AdminInventoryController extends Controller
     }
 
     // Show assign form to select a miller for a palay inventory item
-    public function assignForm($id)
+    public function assignForm(int $id)
     {
         $item = InventoryItem::with('millingRequest')->findOrFail($id);
 
@@ -40,7 +40,7 @@ class AdminInventoryController extends Controller
     }
 
     // Assign selected miller to the associated milling request
-    public function assign(Request $request, $id)
+    public function assign(Request $request, int $id)
     {
         $data = $request->validate([
             'miller_id' => ['required','integer','exists:users,id'],
@@ -86,3 +86,5 @@ class AdminInventoryController extends Controller
         return redirect()->route('admin.inventory')->with('success', 'Milling request assigned to ' . ($miller->fullname ?? $miller->username));
     }
 }
+
+

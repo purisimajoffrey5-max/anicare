@@ -28,7 +28,7 @@ class ScheduleController extends Controller
         return view('miller.schedule', compact('approved'));
     }
 
-    public function setSchedule(Request $request, $id)
+    public function setSchedule(Request $request, int $id)
     {
         $this->requireMiller();
 

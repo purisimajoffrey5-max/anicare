@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Auth;
 
 class CheckRole
 {
-    public function handle(Request $request, Closure $next, $role)
+    public function handle(Request $request, Closure $next, string $role)
     {
         if (!Auth::check()) {
             return redirect('/login');
