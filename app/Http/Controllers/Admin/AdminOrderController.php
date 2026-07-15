@@ -1,8 +1,10 @@
 <?php
 
-namespace App\Http\Controllers\Resident;
+namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\InventoryItem;
+use App\Models\MillingRequest;
 use App\Models\Order;
 use App\Models\RiceProduct;
 use Illuminate\Http\Request;
@@ -10,101 +12,20 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
-class OrderController extends Controller
+class AdminOrderController extends Controller
 {
-    private function requireResident(): void
+    private function requireAdmin(): void
     {
         $u = Auth::user();
 
-        if (!$u || $u->role !== 'resident') {
+        if (!$u || $u->role !== 'admin') {
             abort(403, 'Unauthorized');
         }
     }
 
-    public function index()
-    {
-        $this->requireResident();
-
-        $user = Auth::user();
-
-        $orders = Order::with([
-                'product:id,user_id,name,type,price_per_kg,kilos_available,photo_path,is_active',
-                'farmer:id,fullname,username',
-            ])
-            ->where('resident_id', $user->id)
-            ->orderByDesc('created_at')
-            ->paginate(10);
-
-        return view('resident.orders', compact('user', 'orders'));
-    }
-
-    public function show($id)
-    {
-        $this->requireResident();
-
-        $user = Auth::user();
-
-        $order = Order::with(['product', 'farmer', 'resident'])
-            ->where('id', $id)
-            ->where('resident_id', $user->id)
-            ->firstOrFail();
-
-        $farmerLocation = null;
-        $buyerLocation = null;
-        $currentLocation = null;
-        $currentLocationText = 'Rider location';
-
-        if ($order->farmer && $order->farmer->latitude && $order->farmer->longitude) {
-            $farmerLocation = [
-                'lat' => $order->farmer->latitude,
-                'lng' => $order->farmer->longitude,
-            ];
-        }
-
-        if ($order->resident && $order->resident->latitude && $order->resident->longitude) {
-            $buyerLocation = [
-                'lat' => $order->resident->latitude,
-                'lng' => $order->resident->longitude,
-            ];
-        }
-
-        if ($order->status === 'completed' && $buyerLocation) {
-            $currentLocation = $buyerLocation;
-            $currentLocationText = 'Delivered to your location';
-        } elseif ($farmerLocation) {
-            $currentLocation = $farmerLocation;
-            $currentLocationText = 'Delivery rider is currently at the farmer location';
-        } elseif ($buyerLocation) {
-            $currentLocation = $buyerLocation;
-            $currentLocationText = 'Your saved location';
-        }
-
-        $mapCenterLat = $currentLocation['lat'] ?? ($buyerLocation['lat'] ?? 18.2760);
-        $mapCenterLng = $currentLocation['lng'] ?? ($buyerLocation['lng'] ?? 121.6440);
-
-        $deliveryNote = match ($order->status) {
-            'pending' => 'Order is waiting for farmer confirmation. The rider will be assigned once the farmer approves your request.',
-            'approved' => 'Order is approved and the delivery rider is on the way. Watch the map for the latest rider location.',
-            'completed' => 'Order has been completed. The rider has delivered your order.',
-            'cancelled' => 'This order was cancelled. Please contact the farmer if you have questions.',
-            default => 'Track the current status of your order below.',
-        };
-
-        return view('resident.order-show', compact(
-            'order',
-            'farmerLocation',
-            'buyerLocation',
-            'currentLocation',
-            'currentLocationText',
-            'mapCenterLat',
-            'mapCenterLng',
-            'deliveryNote'
-        ));
-    }
-
     public function showCheckout($id)
     {
-        $this->requireResident();
+        $this->requireAdmin();
 
         $user = Auth::user();
 
@@ -113,12 +34,12 @@ class OrderController extends Controller
             ->where('is_active', 1)
             ->firstOrFail();
 
-        return view('resident.checkout', compact('user', 'product'));
+        return view('admin.checkout', compact('user', 'product'));
     }
 
     public function placeOrder(Request $request, $id)
     {
-        $this->requireResident();
+        $this->requireAdmin();
 
         $user = Auth::user();
 
@@ -175,7 +96,7 @@ class OrderController extends Controller
                 $unitPrice = (float) $product->price_per_kg;
                 $total     = $unitPrice * $qty;
 
-                Order::create([
+                $order = Order::create([
                     'resident_id'      => $user->id,
                     'rice_product_id'  => $product->id,
                     'farmer_id'        => $product->user_id,
@@ -200,19 +121,36 @@ class OrderController extends Controller
                 }
 
                 $product->save();
+
+                $itemType = strtolower($product->type) === 'palay' ? 'palay' : 'rice';
+                $itemStatus = $itemType === 'palay' ? 'awaiting_milling' : 'available';
+
+                $inventory = InventoryItem::create([
+                    'order_id'        => $order->id,
+                    'name'            => $product->name,
+                    'product_type'    => $itemType,
+                    'kilos_available' => $qty,
+                    'price_per_kg'    => $unitPrice,
+                    'status'          => $itemStatus,
+                    'notes'           => 'Admin purchase from product #' . $product->id,
+                ]);
+
+                if ($itemType === 'palay') {
+                    MillingRequest::create([
+                        'user_id'          => $user->id,
+                        'miller_id'        => null,
+                        'kilos'            => $qty,
+                        'notes'            => 'Admin palay purchase - order #' . $order->id,
+                        'status'           => 'pending',
+                        'inventory_item_id'=> $inventory->id,
+                    ]);
+                }
             });
         } catch (ValidationException $e) {
             return back()->withErrors($e->errors())->withInput();
         }
 
-        return redirect()->route('resident.orders.index')
+        return redirect()->route('admin.market')
             ->with('success', 'Order placed successfully! Status: PENDING');
-    }
-
-    public function store(Request $request)
-    {
-        return back()->withErrors([
-            'order' => 'Please use Buy Now to continue to checkout.'
-        ]);
     }
 }

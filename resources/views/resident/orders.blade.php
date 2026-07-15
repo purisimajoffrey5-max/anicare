@@ -33,6 +33,7 @@
             <th>Total</th>
             <th>Status</th>
             <th>Ordered At</th>
+            <th>Action</th>
           </tr>
         </thead>
         <tbody>
@@ -47,10 +48,13 @@
                 <span class="badge bg-secondary text-uppercase">{{ $o->status }}</span>
               </td>
               <td>{{ $o->created_at ? $o->created_at->format('Y-m-d H:i') : '-' }}</td>
+              <td>
+                <a href="{{ route('resident.orders.show', $o->id) }}" class="btn btn-sm btn-outline-primary">Track</a>
+              </td>
             </tr>
           @empty
             <tr>
-              <td colspan="7" class="text-center text-muted py-4">No orders yet.</td>
+              <td colspan="8" class="text-center text-muted py-4">No orders yet.</td>
             </tr>
           @endforelse
         </tbody>

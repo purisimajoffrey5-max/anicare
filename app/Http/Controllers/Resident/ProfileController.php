@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Resident;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -30,11 +31,14 @@ class ProfileController extends Controller
     {
         $this->requireResident();
 
+        /** @var User $user */
         $user = Auth::user();
 
         $data = $request->validate([
             'fullname' => ['required', 'string', 'max:255'],
             'email' => ['nullable', 'email', 'max:255'],
+            'latitude' => ['nullable', 'numeric', 'between:-90,90'],
+            'longitude' => ['nullable', 'numeric', 'between:-180,180'],
         ]);
 
         $user->update($data);

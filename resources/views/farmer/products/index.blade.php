@@ -93,7 +93,28 @@
                   </button>
                 </form>
 
-                <form method="POST" action="{{ route('farmer.products.delete', $p->id) }}" class="d-inline">
+                <form method="POST" action="{{ route('farmer.products.outOfStock', $p->id) }}" class="d-inline ms-1">
+                  @csrf
+                  <button class="btn btn-outline-danger btn-sm"
+                          onclick="return confirm('Mark this product as out of stock?')">
+                    Out of Stock
+                  </button>
+                </form>
+
+                <form method="POST" action="{{ route('farmer.products.restock', $p->id) }}" class="d-inline ms-1">
+                  @csrf
+                  <div class="input-group input-group-sm" style="width:170px; display:inline-flex;">
+                    <input type="number" step="0.1" min="0.1" name="kilos_available"
+                           value="{{ $p->kilos_available > 0 ? number_format($p->kilos_available, 2, '.', '') : '' }}"
+                           class="form-control form-control-sm" placeholder="kg">
+                    <button class="btn btn-outline-primary" type="submit"
+                            onclick="return confirm('Restock this product?')">
+                      Re-stock
+                    </button>
+                  </div>
+                </form>
+
+                <form method="POST" action="{{ route('farmer.products.delete', $p->id) }}" class="d-inline ms-1">
                   @csrf
                   <button class="btn btn-outline-danger btn-sm"
                           onclick="return confirm('Delete this product?')">

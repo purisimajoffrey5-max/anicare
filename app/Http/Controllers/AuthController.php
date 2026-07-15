@@ -35,6 +35,8 @@ class AuthController extends Controller
                 'regex:/[A-Z]/',
                 'regex:/[0-9]/'
             ],
+            'latitude' => ['nullable', 'numeric', 'between:-90,90'],
+            'longitude' => ['nullable', 'numeric', 'between:-180,180'],
         ]);
 
         User::create([
@@ -44,6 +46,8 @@ class AuthController extends Controller
             'barangay' => $data['barangay'],
             'role' => $data['role'],
             'password' => Hash::make($data['password']),
+            'latitude' => $data['latitude'] ?? null,
+            'longitude' => $data['longitude'] ?? null,
             'is_approved' => 0,
             'approved_at' =>  null,
         ]);

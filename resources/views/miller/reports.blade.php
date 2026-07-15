@@ -12,9 +12,12 @@
   <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
       <h3 class="fw-bold text-success m-0">Milling Reports</h3>
-      <div class="text-muted small">Completed milling records</div>
+      <div class="text-muted small">Live report view of completed milling jobs.</div>
     </div>
-    <a href="{{ route('miller.dashboard') }}" class="btn btn-outline-success btn-sm">Back</a>
+    <div class="d-flex gap-2 align-items-center">
+      <small class="text-muted">Auto-refreshes every 30s</small>
+      <a href="{{ route('miller.dashboard') }}" class="btn btn-outline-success btn-sm">Back</a>
+    </div>
   </div>
 
   <div class="card shadow-sm">
@@ -23,7 +26,8 @@
         <thead>
           <tr>
             <th>#</th>
-            <th>Farmer ID</th>
+            <th>Requester</th>
+            <th>Product</th>
             <th>Kilos</th>
             <th>Scheduled</th>
             <th>Completed At</th>
@@ -33,14 +37,18 @@
           @forelse($reports as $r)
             <tr>
               <td>{{ $r->id }}</td>
-              <td>{{ $r->user_id }}</td>
+              <td>
+                {{ optional($r->user)->fullname ?? 'User #' . $r->user_id }}<br>
+                <span class="small text-muted">{{ $r->user ? $r->user->username : 'Farmer' }}</span>
+              </td>
+              <td>{{ optional($r->inventoryItem)->name ?? 'Milling request' }}</td>
               <td>{{ number_format($r->kilos,2) }}</td>
               <td>{{ $r->scheduled_at ? $r->scheduled_at->format('Y-m-d H:i') : '-' }}</td>
               <td>{{ $r->updated_at ? $r->updated_at->format('Y-m-d H:i') : '-' }}</td>
             </tr>
           @empty
             <tr>
-              <td colspan="5" class="text-center text-muted py-4">No reports yet.</td>
+              <td colspan="6" class="text-center text-muted py-4">No reports yet.</td>
             </tr>
           @endforelse
         </tbody>
@@ -53,5 +61,10 @@
   </div>
 </div>
 
+<script>
+  setTimeout(function() {
+    window.location.reload();
+  }, 30000);
+</script>
 </body>
 </html>

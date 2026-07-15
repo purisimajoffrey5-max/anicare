@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -49,6 +49,10 @@
       background:#e2e3e5;
       color:#41464b;
     }
+    .badge-depleted{
+      background:#f8d7da;
+      color:#842029;
+    }
     .btn-soft{
       border-radius:12px;
     }
@@ -85,7 +89,7 @@
     <div class="col-md-3">
       <div class="stat-card p-3">
         <div class="text-muted small">Total Distributions</div>
-        <div class="fs-3 fw-bold">24</div>
+        <div class="fs-3 fw-bold">{{ $stats['total'] ?? 0 }}</div>
         <div class="small text-muted">All recorded distribution entries</div>
       </div>
     </div>
@@ -93,83 +97,102 @@
     <div class="col-md-3">
       <div class="stat-card p-3">
         <div class="text-muted small">Pending</div>
-        <div class="fs-3 fw-bold text-warning">6</div>
-        <div class="small text-muted">Waiting for schedule or approval</div>
+        <div class="fs-3 fw-bold text-warning">{{ $stats['pending'] ?? 0 }}</div>
+        <div class="small text-muted">Waiting for schedule</div>
       </div>
     </div>
 
     <div class="col-md-3">
       <div class="stat-card p-3">
         <div class="text-muted small">Scheduled</div>
-        <div class="fs-3 fw-bold text-primary">10</div>
-        <div class="small text-muted">Ready for release or delivery</div>
+        <div class="fs-3 fw-bold text-primary">{{ $stats['scheduled'] ?? 0 }}</div>
+        <div class="small text-muted">Ready for release</div>
       </div>
     </div>
 
     <div class="col-md-3">
       <div class="stat-card p-3">
         <div class="text-muted small">Completed</div>
-        <div class="fs-3 fw-bold text-success">8</div>
+        <div class="fs-3 fw-bold text-success">{{ $stats['completed'] ?? 0 }}</div>
         <div class="small text-muted">Successfully distributed</div>
       </div>
     </div>
   </div>
 
-  {{-- Info Box --}}
-  <div class="soft-card p-3 mb-3">
-    <h5 class="section-title mb-2">About this Module</h5>
-    <p class="text-muted mb-2">
-      This module is intended to manage the distribution of rice assistance to qualified beneficiaries.
-      The administrator can monitor distribution records, assign schedules, review beneficiary details,
-      and confirm completed releases.
-    </p>
-    <p class="text-muted mb-0">
-      In the full implementation, this page can be connected to resident records, inventory deductions,
-      distribution logs, and report generation.
-    </p>
-  </div>
+  {{-- Filter/Search + Add Form --}}
+  <div class="row g-3 mb-3">
+    <div class="col-lg-8">
+      <div class="soft-card p-3">
+        <form class="row g-2" method="GET" action="{{ route('admin.distribution') }}">
+          <div class="col-md-4">
+            <label class="form-label small">Search Beneficiary / Ref No.</label>
+            <input type="text" name="search" class="form-control" value="{{ request('search') }}" placeholder="e.g. Juan Dela Cruz or 1">
+          </div>
 
-  {{-- Filter/Search --}}
-  <div class="soft-card p-3 mb-3">
-    <form class="row g-2">
-      <div class="col-md-4">
-        <label class="form-label small">Search Beneficiary / Reference No.</label>
-        <input type="text" class="form-control" placeholder="e.g. Juan Dela Cruz or DIST-001">
-      </div>
+          <div class="col-md-3">
+            <label class="form-label small">Status</label>
+            <select name="status" class="form-select">
+              <option value="all"{{ request('status') === 'all' ? ' selected' : '' }}>All Status</option>
+              <option value="pending"{{ request('status') === 'pending' ? ' selected' : '' }}>Pending</option>
+              <option value="scheduled"{{ request('status') === 'scheduled' ? ' selected' : '' }}>Scheduled</option>
+              <option value="completed"{{ request('status') === 'completed' ? ' selected' : '' }}>Completed</option>
+              <option value="cancelled"{{ request('status') === 'cancelled' ? ' selected' : '' }}>Cancelled</option>
+            </select>
+          </div>
 
-      <div class="col-md-3">
-        <label class="form-label small">Status</label>
-        <select class="form-select">
-          <option selected>All Status</option>
-          <option>Pending</option>
-          <option>Scheduled</option>
-          <option>Completed</option>
-          <option>Cancelled</option>
-        </select>
-      </div>
+          <div class="col-md-3">
+            <label class="form-label small">Barangay</label>
+            <select name="barangay" class="form-select">
+              <option value="all">All Barangays</option>
+              @foreach($barangays as $barangay)
+                <option value="{{ $barangay }}"{{ request('barangay') === $barangay ? ' selected' : '' }}>{{ $barangay }}</option>
+              @endforeach
+            </select>
+          </div>
 
-      <div class="col-md-3">
-        <label class="form-label small">Barangay</label>
-        <select class="form-select">
-          <option selected>All Barangays</option>
-          <option>Bessang</option>
-          <option>Binubungan</option>
-          <option>Bulo</option>
-          <option>Burot</option>
-          <option>Centro East (Poblacion)</option>
-          <option>Centro West (Poblacion)</option>
-          <option>Dagupan</option>
-          <option>San Juan (Maguininango)</option>
-          <option>Tamboli</option>
-          <option>Utan</option>
-        </select>
+          <div class="col-md-2 d-grid">
+            <label class="form-label small invisible">Action</label>
+            <button type="submit" class="btn btn-success btn-soft">Filter</button>
+          </div>
+        </form>
       </div>
+    </div>
 
-      <div class="col-md-2 d-grid">
-        <label class="form-label small invisible">Action</label>
-        <button type="submit" class="btn btn-success btn-soft">Filter</button>
+    <div class="col-lg-4">
+      <div class="soft-card p-3 h-100">
+        <h5 class="mb-3">Add Distribution</h5>
+        <form method="POST" action="{{ route('admin.distribution.store') }}">
+          @csrf
+          <div class="mb-2">
+            <label class="form-label small">Beneficiary Name</label>
+            <input type="text" name="beneficiary_name" class="form-control form-control-sm" value="{{ old('beneficiary_name') }}" required>
+          </div>
+          <div class="mb-2">
+            <label class="form-label small">Email</label>
+            <input type="email" name="beneficiary_email" class="form-control form-control-sm" value="{{ old('beneficiary_email') }}">
+          </div>
+          <div class="mb-2">
+            <label class="form-label small">Barangay</label>
+            <input type="text" name="barangay" class="form-control form-control-sm" value="{{ old('barangay') }}">
+          </div>
+          <div class="mb-2">
+            <label class="form-label small">Rice Quantity (kg)</label>
+            <input type="number" step="0.1" min="0.5" name="rice_qty" class="form-control form-control-sm" value="{{ old('rice_qty') }}" required>
+          </div>
+          <div class="mb-2">
+            <label class="form-label small">Schedule</label>
+            <input type="datetime-local" name="scheduled_at" class="form-control form-control-sm" value="{{ old('scheduled_at') }}">
+          </div>
+          <div class="mb-2">
+            <label class="form-label small">Notes</label>
+            <input type="text" name="notes" class="form-control form-control-sm" value="{{ old('notes') }}">
+          </div>
+          <div class="d-grid">
+            <button class="btn btn-success btn-soft btn-sm">Create Record</button>
+          </div>
+        </form>
       </div>
-    </form>
+    </div>
   </div>
 
   {{-- Distribution Table --}}
@@ -179,8 +202,7 @@
         <h5 class="fw-bold m-0">Distribution Records</h5>
         <div class="text-muted small">Monitor rice distribution schedule and beneficiary release status.</div>
       </div>
-
-      <button class="btn btn-success btn-sm btn-soft">+ Add Distribution</button>
+      <div class="text-muted small">Showing {{ $distributions->count() }} of {{ $distributions->total() }} records</div>
     </div>
 
     <div class="table-responsive">
@@ -198,81 +220,53 @@
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td class="fw-semibold">DIST-001</td>
-            <td>
-              <div class="fw-semibold">Juan Dela Cruz</div>
-              <div class="text-muted small">juan@email.com</div>
-            </td>
-            <td>Centro East</td>
-            <td>25 kg</td>
-            <td>2026-03-12 09:00 AM</td>
-            <td><span class="badge-soft badge-pending">PENDING</span></td>
-            <td>Admin</td>
-            <td class="text-end">
-              <button class="btn btn-outline-dark btn-sm btn-soft">View</button>
-              <button class="btn btn-primary btn-sm btn-soft">Schedule</button>
-            </td>
-          </tr>
-
-          <tr>
-            <td class="fw-semibold">DIST-002</td>
-            <td>
-              <div class="fw-semibold">Maria Santos</div>
-              <div class="text-muted small">maria@email.com</div>
-            </td>
-            <td>Dagupan</td>
-            <td>50 kg</td>
-            <td>2026-03-13 01:30 PM</td>
-            <td><span class="badge-soft badge-scheduled">SCHEDULED</span></td>
-            <td>Admin</td>
-            <td class="text-end">
-              <button class="btn btn-outline-dark btn-sm btn-soft">View</button>
-              <button class="btn btn-success btn-sm btn-soft">Confirm</button>
-            </td>
-          </tr>
-
-          <tr>
-            <td class="fw-semibold">DIST-003</td>
-            <td>
-              <div class="fw-semibold">Pedro Reyes</div>
-              <div class="text-muted small">pedro@email.com</div>
-            </td>
-            <td>San Juan</td>
-            <td>30 kg</td>
-            <td>2026-03-10 10:00 AM</td>
-            <td><span class="badge-soft badge-completed">COMPLETED</span></td>
-            <td>Admin</td>
-            <td class="text-end">
-              <button class="btn btn-outline-dark btn-sm btn-soft">View</button>
-            </td>
-          </tr>
-
-          <tr>
-            <td class="fw-semibold">DIST-004</td>
-            <td>
-              <div class="fw-semibold">Ana Lopez</div>
-              <div class="text-muted small">ana@email.com</div>
-            </td>
-            <td>Tamboli</td>
-            <td>20 kg</td>
-            <td>2026-03-09 03:00 PM</td>
-            <td><span class="badge-soft badge-cancelled">CANCELLED</span></td>
-            <td>Admin</td>
-            <td class="text-end">
-              <button class="btn btn-outline-dark btn-sm btn-soft">View</button>
-            </td>
-          </tr>
+          @forelse($distributions as $distribution)
+            <tr>
+              <td class="fw-semibold">DIST-{{ str_pad($distribution->id, 3, '0', STR_PAD_LEFT) }}</td>
+              <td>
+                <div class="fw-semibold">{{ $distribution->beneficiary_name }}</div>
+                <div class="text-muted small">{{ $distribution->beneficiary_email ?: 'No email' }}</div>
+              </td>
+              <td>{{ $distribution->barangay ?: '-' }}</td>
+              <td>{{ number_format($distribution->rice_qty, 2) }} kg</td>
+              <td>{{ $distribution->scheduled_at ? $distribution->scheduled_at->format('Y-m-d H:i') : '-' }}</td>
+              <td>
+                <span class="badge-soft badge-{{ $distribution->status === 'pending' ? 'pending' : ($distribution->status === 'scheduled' ? 'scheduled' : ($distribution->status === 'completed' ? 'completed' : 'cancelled')) }}">
+                  {{ strtoupper($distribution->status) }}
+                </span>
+              </td>
+              <td>{{ optional($distribution->processedBy)->fullname ?? 'Admin' }}</td>
+              <td class="text-end">
+                @if($distribution->status === 'pending')
+                  <form class="d-inline" method="POST" action="{{ route('admin.distribution.schedule', $distribution->id) }}">
+                    @csrf
+                    <input type="hidden" name="scheduled_at" value="{{ now()->addDay()->format('Y-m-d\TH:i') }}">
+                    <button class="btn btn-primary btn-sm btn-soft">Schedule</button>
+                  </form>
+                @elseif($distribution->status === 'scheduled')
+                  <form class="d-inline" method="POST" action="{{ route('admin.distribution.complete', $distribution->id) }}">
+                    @csrf
+                    <button class="btn btn-success btn-sm btn-soft">Complete</button>
+                  </form>
+                @else
+                  <span class="text-muted">—</span>
+                @endif
+              </td>
+            </tr>
+          @empty
+            <tr>
+              <td colspan="8" class="text-center text-muted py-4">No distribution records found.</td>
+            </tr>
+          @endforelse
         </tbody>
       </table>
     </div>
 
-    <div class="mt-3 text-muted small">
-      Showing sample records for layout preview. Connect this table to your actual distribution database later.
-    </div>
+    <div class="mt-3">{{ $distributions->links() }}</div>
   </div>
 
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

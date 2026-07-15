@@ -18,7 +18,9 @@ class ReportController extends Controller
     {
         $this->requireMiller();
 
-        $reports = MillingRequest::where('status', 'completed')
+        $reports = MillingRequest::with(['user', 'inventoryItem'])
+            ->where('miller_id', Auth::id())
+            ->where('status', 'completed')
             ->orderByDesc('updated_at')
             ->paginate(10);
 

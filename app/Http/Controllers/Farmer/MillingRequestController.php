@@ -28,6 +28,20 @@ class MillingRequestController extends Controller
         ]);
     }
 
+    public function index()
+    {
+        $user = Auth::user();
+        if (!$user || $user->role !== 'farmer') abort(403);
+
+        $requests = MillingRequest::where('user_id', $user->id)
+            ->orderByDesc('created_at')
+            ->paginate(10);
+
+        return view('farmer.milling.index', [
+            'requests' => $requests,
+        ]);
+    }
+
     public function store(Request $request)
     {
         $user = Auth::user();
@@ -51,7 +65,7 @@ class MillingRequestController extends Controller
         }
 
         MillingRequest::create([
-            'farmer_id' => $user->id,
+            'user_id'   => $user->id,
             'miller_id' => $miller->id,
             'kilos'     => $data['kilos'],
             'notes'     => $data['notes'] ?? null,

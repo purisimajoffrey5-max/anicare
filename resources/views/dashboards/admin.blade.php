@@ -171,6 +171,16 @@
       </a>
     </div>
 
+    <div class="col-12 col-sm-6 col-lg-4">
+      <a href="{{ route('admin.notifications') }}" class="card-link">
+        <div class="dash-card p-3">
+          <h5 class="fw-bold text-success">Notifications</h5>
+          <div class="text-muted small mb-3">View admin alerts</div>
+          <span class="btn btn-success btn-sm">Open</span>
+        </div>
+      </a>
+    </div>
+
   </div>
 
   {{-- STATS --}}

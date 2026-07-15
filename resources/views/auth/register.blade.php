@@ -5,6 +5,11 @@
   <title>Register | ANI-CARE</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <style>
+    #registrationMap { height: 260px; border-radius: 14px; border: 1px solid rgba(0,0,0,.10); }
+    .leaflet-container { background: #f8f9fa; }
+  </style>
 </head>
 <body class="bg-light">
 
@@ -104,6 +109,24 @@
               </div>
             </div>
 
+            <div class="mb-3">
+              <label class="form-label">Delivery / Location Coordinates</label>
+              <div class="text-muted small mb-2">Optional: select your location on the map to save latitude/longitude for order tracking and delivery.</div>
+              <input id="registration_lat" type="hidden" name="latitude" value="{{ old('latitude') }}">
+              <input id="registration_lng" type="hidden" name="longitude" value="{{ old('longitude') }}">
+              <div id="registrationMap"></div>
+              <div class="row mt-3 gx-2">
+                <div class="col-6">
+                  <label class="form-label">Latitude</label>
+                  <input id="registration_lat_display" type="text" class="form-control" value="{{ old('latitude') }}" readonly>
+                </div>
+                <div class="col-6">
+                  <label class="form-label">Longitude</label>
+                  <input id="registration_lng_display" type="text" class="form-control" value="{{ old('longitude') }}" readonly>
+                </div>
+              </div>
+            </div>
+
             <div class="alert alert-info small">
               Password must be at least 8 characters and include <b>uppercase</b>, <b>lowercase</b>, and a <b>number</b>.
             </div>
@@ -116,6 +139,41 @@
             </div>
           </form>
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  const savedLat = {{ old('latitude') !== null ? (float) old('latitude') : 'null' }};
+  const savedLng = {{ old('longitude') !== null ? (float) old('longitude') : 'null' }};
+  const mapCenter = savedLat !== null && savedLng !== null ? [savedLat, savedLng] : [18.2760, 121.6440];
+  const registrationMap = L.map('registrationMap').setView(mapCenter, savedLat !== null && savedLng !== null ? 14 : 12);
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(registrationMap);
+
+  let registrationMarker = null;
+
+  if (savedLat !== null && savedLng !== null) {
+    registrationMarker = L.marker([savedLat, savedLng]).addTo(registrationMap)
+      .bindPopup('Selected location').openPopup();
+  }
+
+  registrationMap.on('click', function(e) {
+    const lat = e.latlng.lat.toFixed(8);
+    const lng = e.latlng.lng.toFixed(8);
+
+    if (registrationMarker) {
+      registrationMap.removeLayer(registrationMarker);
+    }
+
+    registrationMarker = L.marker([lat, lng]).addTo(registrationMap)
+      .bindPopup('Location selected').openPopup();
+
+    document.getElementById('registration_lat').value = lat;
+    document.getElementById('registration_lng').value = lng;
+    document.getElementById('registration_lat_display').value = lat;
+    document.getElementById('registration_lng_display').value = lng;
+  });
+</script>
         </div>
       </div>
     </div>

@@ -8,6 +8,10 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminApprovalsController;
 use App\Http\Controllers\AdminFarmersMillersController;
 use App\Http\Controllers\Admin\AnnouncementController as AdminAnnouncementController;
+use App\Http\Controllers\Admin\AdminInventoryController;
+use App\Http\Controllers\Admin\AdminMarketplaceController;
+use App\Http\Controllers\Admin\AdminOrderController;
+use App\Http\Controllers\Admin\AdminDistributionController;
 
 use App\Http\Controllers\Farmer\DashboardController as FarmerDashboardController;
 use App\Http\Controllers\Farmer\FarmProfileController;
@@ -62,9 +66,22 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/dashboard', fn () => view('dashboards.admin'))->name('dashboard');
 
     Route::view('/overview', 'admin.overview')->name('overview');
-    Route::view('/inventory', 'admin.inventory')->name('inventory');
-    Route::view('/distribution', 'admin.distribution')->name('distribution');
-    Route::view('/market', 'admin.market')->name('market');
+    Route::get('/inventory', [AdminInventoryController::class, 'index'])->name('inventory');
+    Route::get('/distribution', [AdminDistributionController::class, 'index'])->name('distribution');
+    Route::post('/distribution', [AdminDistributionController::class, 'store'])->name('distribution.store');
+    Route::post('/distribution/{id}/schedule', [AdminDistributionController::class, 'schedule'])->name('distribution.schedule');
+    Route::post('/distribution/{id}/complete', [AdminDistributionController::class, 'complete'])->name('distribution.complete');
+    Route::get('/market', [AdminMarketplaceController::class,'index'])
+    ->name('market');
+
+    // ✅ ADMIN CHECKOUT - Admin role required
+    Route::middleware('role:admin')->group(function () {
+        Route::get('/checkout/{id}', [AdminOrderController::class, 'showCheckout'])->name('checkout.show');
+        Route::post('/checkout/{id}', [AdminOrderController::class, 'placeOrder'])->name('checkout.place');
+        // Assign palay to a miller
+        Route::get('/inventory/assign/{id}', [\App\Http\Controllers\Admin\AdminInventoryController::class, 'assignForm'])->name('inventory.assign.form');
+        Route::post('/inventory/assign/{id}', [\App\Http\Controllers\Admin\AdminInventoryController::class, 'assign'])->name('inventory.assign');
+    });
 
     Route::get('/farmers-millers', [AdminFarmersMillersController::class, 'index'])->name('farmers_millers');
     Route::get('/farmers-millers/{id}', [AdminFarmersMillersController::class, 'show'])->name('farmers_millers.show');
@@ -82,6 +99,9 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/announcements-library', [AdminAnnouncementController::class, 'library'])->name('announcements.library');
     Route::post('/announcements/{id}/restore', [AdminAnnouncementController::class, 'restore'])->name('announcements.restore');
     Route::post('/announcements/{id}/delete', [AdminAnnouncementController::class, 'destroy'])->name('announcements.delete');
+
+    Route::get('/notifications', [\App\Http\Controllers\Admin\NotificationController::class, 'index'])->name('notifications');
+    Route::post('/notifications/{id}/read', [\App\Http\Controllers\Admin\NotificationController::class, 'markAsRead'])->name('notifications.read');
 });
 
 /*
@@ -97,7 +117,7 @@ Route::middleware(['auth'])->prefix('farmer')->name('farmer.')->group(function (
     Route::post('/profile', [FarmProfileController::class, 'update'])->name('profile.update');
 
     // ✅ Save Farmer location (keep inside farmer prefix)
-    Route::post('/location', [LocationController::class, 'saveFarmer'])->name('location.save');
+    Route::post('/location', [LocationController::class, 'saveFarmer'])->name('farmer.location.save');
 
     Route::get('/milling/request', [MillingRequestController::class, 'create'])->name('milling.create');
     Route::post('/milling/request', [MillingRequestController::class, 'store'])->name('milling.store');
@@ -107,6 +127,8 @@ Route::middleware(['auth'])->prefix('farmer')->name('farmer.')->group(function (
     Route::get('/products/create', [RiceProductController::class, 'create'])->name('products.create');
     Route::post('/products/create', [RiceProductController::class, 'store'])->name('products.store');
     Route::post('/products/{id}/toggle', [RiceProductController::class, 'toggle'])->name('products.toggle');
+    Route::post('/products/{id}/stock/out', [RiceProductController::class, 'outOfStock'])->name('products.outOfStock');
+    Route::post('/products/{id}/stock/restock', [RiceProductController::class, 'restock'])->name('products.restock');
     Route::post('/products/{id}/delete', [RiceProductController::class, 'destroy'])->name('products.delete');
 
     Route::get('/orders', [FarmerOrderController::class, 'index'])->name('orders.index');
@@ -126,6 +148,7 @@ Route::middleware(['auth'])->prefix('miller')->name('miller.')->group(function (
 
     Route::get('/requests', [MillerRequestController::class, 'index'])->name('requests');
     Route::post('/requests/{id}/approve', [MillerRequestController::class, 'approve'])->name('requests.approve');
+    Route::post('/requests/{id}/accept', [MillerRequestController::class, 'accept'])->name('requests.accept');
     Route::post('/requests/{id}/reject', [MillerRequestController::class, 'reject'])->name('requests.reject');
     Route::post('/requests/{id}/complete', [MillerRequestController::class, 'complete'])->name('requests.complete');
 
@@ -134,9 +157,12 @@ Route::middleware(['auth'])->prefix('miller')->name('miller.')->group(function (
 
     Route::get('/reports', [MillerReportController::class, 'index'])->name('reports');
 
+    // Notifications for millers
+    Route::get('/notifications', [\App\Http\Controllers\Miller\NotificationController::class, 'index'])->name('notifications');
+    Route::post('/notifications/{id}/read', [\App\Http\Controllers\Miller\NotificationController::class, 'markAsRead'])->name('notifications.read');
     // ✅ Miller profile page + save location
     Route::get('/profile', [MillerProfileController::class, 'edit'])->name('profile');
-    Route::post('/location', [LocationController::class, 'saveMiller'])->name('location.save');
+    Route::post('/location', [LocationController::class, 'saveMiller'])->name('miller.location.save');
 });
 
 /*
@@ -150,6 +176,7 @@ Route::middleware(['auth'])->prefix('resident')->name('resident.')->group(functi
     Route::get('/marketplace', [ResidentMarketplaceController::class, 'index'])->name('marketplace');
 
     Route::get('/orders', [ResidentOrderController::class, 'index'])->name('orders.index');
+    Route::get('/orders/{id}', [ResidentOrderController::class, 'show'])->name('orders.show');
     Route::post('/orders', [ResidentOrderController::class, 'store'])->name('orders.store');
 
     // ✅ CHECKOUT

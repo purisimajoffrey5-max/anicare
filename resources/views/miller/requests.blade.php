@@ -46,7 +46,8 @@
         <thead>
           <tr>
             <th>#</th>
-            <th>Farmer ID</th>
+            <th>Requester</th>
+            <th>Product</th>
             <th>Kilos</th>
             <th>Status</th>
             <th>Scheduled</th>
@@ -58,9 +59,22 @@
           @forelse($requests as $r)
             <tr>
               <td>{{ $r->id }}</td>
-              <td>{{ $r->user_id }}</td>
+              <td>
+                <div>{{ optional($r->user)->fullname ?? 'User #' . $r->user_id }}</div>
+                <div class="small text-muted">Farmer / Resident</div>
+              </td>
+              <td>
+                {{ optional($r->inventoryItem)->name ?? 'Milling request' }}
+                @if($r->status === 'assigned')
+                  <div class="small text-info">Assigned by admin</div>
+                @endif
+              </td>
               <td>{{ number_format($r->kilos,2) }}</td>
-              <td><span class="badge bg-secondary text-uppercase">{{ $r->status }}</span></td>
+              <td>
+                <span class="badge bg-{{ $r->status === 'approved' ? 'primary' : ($r->status === 'assigned' ? 'warning' : ($r->status === 'completed' ? 'success' : 'secondary')) }} text-uppercase">
+                  {{ $r->status }}
+                </span>
+              </td>
               <td>{{ $r->scheduled_at ? $r->scheduled_at->format('Y-m-d H:i') : '-' }}</td>
               <td>{{ $r->created_at ? $r->created_at->format('Y-m-d H:i') : '-' }}</td>
 
@@ -69,6 +83,15 @@
                   <form class="d-inline" method="POST" action="{{ route('miller.requests.approve', $r->id) }}">
                     @csrf
                     <button class="btn btn-success btn-sm" onclick="return confirm('Approve this request?')">Approve</button>
+                  </form>
+                  <form class="d-inline" method="POST" action="{{ route('miller.requests.reject', $r->id) }}">
+                    @csrf
+                    <button class="btn btn-outline-danger btn-sm" onclick="return confirm('Reject this request?')">Reject</button>
+                  </form>
+                @elseif($r->status === 'assigned')
+                  <form class="d-inline" method="POST" action="{{ route('miller.requests.accept', $r->id) }}">
+                    @csrf
+                    <button class="btn btn-primary btn-sm" onclick="return confirm('Accept this assigned request?')">Accept</button>
                   </form>
                   <form class="d-inline" method="POST" action="{{ route('miller.requests.reject', $r->id) }}">
                     @csrf
@@ -86,7 +109,7 @@
             </tr>
           @empty
             <tr>
-              <td colspan="7" class="text-center text-muted py-4">No requests found.</td>
+              <td colspan="8" class="text-center text-muted py-4">No requests found.</td>
             </tr>
           @endforelse
         </tbody>

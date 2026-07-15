@@ -19,7 +19,9 @@ class ScheduleController extends Controller
     {
         $this->requireMiller();
 
-        $approved = MillingRequest::where('status', 'approved')
+        $approved = MillingRequest::with(['user', 'inventoryItem'])
+            ->where('miller_id', Auth::id())
+            ->whereIn('status', ['assigned', 'approved'])
             ->orderByDesc('created_at')
             ->paginate(10);
 

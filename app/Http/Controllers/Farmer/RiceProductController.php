@@ -77,6 +77,38 @@ class RiceProductController extends Controller
         return back()->with('success', 'Product status updated.');
     }
 
+    public function outOfStock($id)
+    {
+        $this->requireFarmer();
+        $user = Auth::user();
+
+        $p = RiceProduct::where('id', $id)->where('user_id', $user->id)->firstOrFail();
+        $p->kilos_available = 0;
+        $p->is_active = 0;
+        $p->save();
+
+        return back()->with('success', 'Product marked as out of stock.');
+    }
+
+    public function restock(Request $request, $id)
+    {
+        $this->requireFarmer();
+        $user = Auth::user();
+
+        $data = $request->validate([
+            'kilos_available' => ['required', 'numeric', 'min:0.1'],
+        ]);
+
+        $p = RiceProduct::where('id', $id)->where('user_id', $user->id)->firstOrFail();
+        $p->kilos_available = $data['kilos_available'];
+        if ($data['kilos_available'] > 0) {
+            $p->is_active = 1;
+        }
+        $p->save();
+
+        return back()->with('success', 'Product stock updated.');
+    }
+
     public function destroy($id)
     {
         $this->requireFarmer();
