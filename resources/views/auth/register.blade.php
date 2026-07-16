@@ -127,24 +127,6 @@
               </div>
             </div>
 
-            <div class="mb-3">
-              <label class="form-label">Delivery / Location Coordinates</label>
-              <div class="text-muted small mb-2">Optional: select your location on the map to save latitude/longitude for order tracking and delivery.</div>
-              <input id="registration_lat" type="hidden" name="latitude" value="{{ old('latitude') }}">
-              <input id="registration_lng" type="hidden" name="longitude" value="{{ old('longitude') }}">
-              <div id="registrationMap"></div>
-              <div class="row mt-3 gx-2">
-                <div class="col-6">
-                  <label class="form-label">Latitude</label>
-                  <input id="registration_lat_display" type="text" class="form-control" value="{{ old('latitude') }}" readonly>
-                </div>
-                <div class="col-6">
-                  <label class="form-label">Longitude</label>
-                  <input id="registration_lng_display" type="text" class="form-control" value="{{ old('longitude') }}" readonly>
-                </div>
-              </div>
-            </div>
-
             <div class="alert alert-info small">
               Password must be at least 8 characters and include <b>uppercase</b>, <b>lowercase</b>, and a <b>number</b>.
             </div>

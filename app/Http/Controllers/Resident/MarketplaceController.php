@@ -13,16 +13,25 @@ class MarketplaceController extends Controller
     private function requireResident(): void
     {
         $u = Auth::user();
-        if (!$u || $u->role !== 'resident') abort(403, 'Unauthorized');
+
+        if (!$u || $u->role !== 'resident') {
+            abort(403, 'Unauthorized');
+        }
     }
 
+    /**
+     * Display marketplace.
+     */
     public function index(Request $request)
     {
         $this->requireResident();
 
         $q = trim((string) $request->get('q', ''));
 
-        $openMillersCount = User::where('role', 'miller')->where('is_open', 1)->count();
+        $openMillersCount = User::where('role', 'miller')
+            ->where('is_open', 1)
+            ->count();
+
         $millers = User::where('role', 'miller')
             ->orderByDesc('is_open')
             ->orderBy('fullname')
@@ -35,16 +44,16 @@ class MarketplaceController extends Controller
         if ($q !== '') {
             $productsQuery->where(function ($qq) use ($q) {
                 $qq->where('name', 'like', "%{$q}%")
-                   ->orWhere('type', 'like', "%{$q}%")
-                   ->orWhereHas('user', function ($u) use ($q) {
-                       $u->where('fullname', 'like', "%{$q}%")
-                         ->orWhere('username', 'like', "%{$q}%");
-                   });
+                    ->orWhere('type', 'like', "%{$q}%")
+                    ->orWhereHas('user', function ($u) use ($q) {
+                        $u->where('fullname', 'like', "%{$q}%")
+                          ->orWhere('username', 'like', "%{$q}%");
+                    });
             });
         }
 
         $products = $productsQuery
-            ->orderByDesc('created_at')
+            ->latest()
             ->paginate(9)
             ->withQueryString();
 
@@ -54,5 +63,17 @@ class MarketplaceController extends Controller
             'millers',
             'products'
         ));
+    }
+
+    /**
+     * Show a single product.
+     */
+    public function show($id)
+    {
+        $this->requireResident();
+
+        $product = RiceProduct::with('user')->findOrFail($id);
+
+        return view('resident.product-show', compact('product'));
     }
 }

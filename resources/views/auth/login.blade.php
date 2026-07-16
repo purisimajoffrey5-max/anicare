@@ -66,9 +66,25 @@
             <button class="btn btn-success w-100">Login</button>
 
             <div class="text-center mt-3">
-              <a href="{{ route('register') }}">Create Account</a> |
-              <a href="{{ route('main') }}">Back to Home</a>
-            </div>
+
+    <a href="{{ route('forgot.password') }}"
+       class="text-danger fw-semibold">
+        Forgot Password?
+    </a>
+
+    <br><br>
+
+    <a href="{{ route('register') }}">
+        Create Account
+    </a>
+
+    |
+
+    <a href="{{ route('main') }}">
+        Back to Home
+    </a>
+
+</div>
           </form>
 
         </div>

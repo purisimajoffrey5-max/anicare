@@ -33,6 +33,7 @@ use App\Http\Controllers\Resident\MapController;
 
 use App\Http\Controllers\LocationController;
 
+use App\Http\Controllers\ForgotPasswordController;
 /*
 |--------------------------------------------------------------------------
 | PUBLIC
@@ -117,7 +118,8 @@ Route::middleware(['auth'])->prefix('farmer')->name('farmer.')->group(function (
     Route::post('/profile', [FarmProfileController::class, 'update'])->name('profile.update');
 
     // ✅ Save Farmer location (keep inside farmer prefix)
-    Route::post('/location', [LocationController::class, 'saveFarmer'])->name('farmer.location.save');
+    Route::post('/location', [LocationController::class, 'saveFarmer'])
+    ->name('location.save');
 
     Route::get('/milling/request', [MillingRequestController::class, 'create'])->name('milling.create');
     Route::post('/milling/request', [MillingRequestController::class, 'store'])->name('milling.store');
@@ -162,7 +164,8 @@ Route::middleware(['auth'])->prefix('miller')->name('miller.')->group(function (
     Route::post('/notifications/{id}/read', [\App\Http\Controllers\Miller\NotificationController::class, 'markAsRead'])->name('notifications.read');
     // ✅ Miller profile page + save location
     Route::get('/profile', [MillerProfileController::class, 'edit'])->name('profile');
-    Route::post('/location', [LocationController::class, 'saveMiller'])->name('miller.location.save');
+    Route::post('/location', [LocationController::class, 'saveMiller'])
+    ->name('location.save');
 });
 
 /*
@@ -188,4 +191,25 @@ Route::middleware(['auth'])->prefix('resident')->name('resident.')->group(functi
 
     // ✅ Map data endpoint protected by auth and under resident
     Route::get('/map-data', [MapController::class, 'mapData'])->name('map.data');
+
+    Route::get('/product/{id}', [ResidentMarketplaceController::class, 'show'])
+    ->name('product.show');
 });
+
+Route::get('/forgot-password', [ForgotPasswordController::class, 'showEmailForm'])
+    ->name('forgot.password');
+
+Route::post('/forgot-password', [ForgotPasswordController::class, 'sendOtp'])
+    ->name('forgot.password.send');
+
+Route::get('/verify-otp', [ForgotPasswordController::class, 'showOtpForm'])
+    ->name('otp.form');
+
+Route::post('/verify-otp', [ForgotPasswordController::class, 'verifyOtp'])
+    ->name('otp.verify');
+
+Route::get('/reset-password', [ForgotPasswordController::class, 'showResetForm'])
+    ->name('password.reset.form');
+
+Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword'])
+    ->name('password.reset');

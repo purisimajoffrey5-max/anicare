@@ -278,10 +278,19 @@
           <div class="product-price">₱{{ number_format($price, 2) }} / kg</div>
           <div class="stock-note">{{ number_format($stock, 2) }} kg available</div>
 
-          <a href="{{ route('resident.checkout.show', $p->id) }}"
-             class="buy-btn {{ $stock <= 0 ? 'disabled' : '' }}">
-            Buy Now
-          </a>
+          <div class="d-grid gap-2">
+
+    <a href="{{ route('resident.product.show', $p->id) }}"
+       class="btn btn-outline-primary">
+        👁 View Details
+    </a>
+
+    <a href="{{ route('resident.checkout.show', $p->id) }}"
+       class="buy-btn {{ $stock <= 0 ? 'disabled' : '' }}">
+        🛒 Buy Now
+    </a>
+
+</div>
         </div>
       </div>
     @empty
