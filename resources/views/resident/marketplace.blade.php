@@ -1,311 +1,1403 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Marketplace | Resident</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- Mobile responsive helpers -->
-  <style>
-    html { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-    *, *::before, *::after { box-sizing: inherit; }
-    body { min-height: 100vh; margin: 0; }
-    img, video, iframe, svg, canvas { max-width: 100%; height: auto; }
-    .container, .container-fluid { width: 100% !important; max-width: 100% !important; padding-left: 1rem !important; padding-right: 1rem !important; }
-    .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-    .table-responsive table { min-width: 100%; }
-    .leaflet-container, #registrationMap, #residentMap, #orderMap, #trackMap { width: 100% !important; max-width: 100%; }
-    .card, .card-body { word-wrap: break-word; }
-    .btn, .form-control, .form-select, .input-group, .form-check-input { min-width: 0; }
-    @media (max-width: 768px) {
-      .navbar, .topbar { flex-wrap: wrap !important; }
-      .navbar-brand, .navbar-nav, .btn { width: 100% !important; text-align: center !important; }
-      .table-responsive { margin-left: -1rem !important; margin-right: -1rem !important; padding-left: 1rem !important; padding-right: 1rem !important; }
-    }
-  </style>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
-  <style>
-    body{
-      background:#f5f7fb;
-      font-family:"Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-    }
+<meta charset="UTF-8">
 
-    .topbar{
-      background:#198754;
-    }
+<meta name="viewport"
+      content="width=device-width, initial-scale=1">
 
-    .wrap{
-      max-width:1100px;
-      margin:0 auto;
-      padding:16px 14px 70px;
-    }
+<title>ANI-CARE Marketplace</title>
 
-    .soft{
-      border:1px solid rgba(0,0,0,.06);
-      border-radius:18px;
-      background:#fff;
-      box-shadow:0 8px 20px rgba(16,24,40,.05);
-    }
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet">
 
-    .pill{
-      border-radius:999px;
-      padding:6px 10px;
-      font-size:12px;
-      font-weight:700;
-    }
+<link rel="stylesheet"
+href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 
-    .product-img{
-      width:100%;
-      height:180px;
-      object-fit:cover;
-      border-radius:14px;
-      background:#e9ecef;
-    }
+<style>
 
-    .no-photo{
-      width:100%;
-      height:180px;
-      border-radius:14px;
-      background:#e9ecef;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      color:#6c757d;
-      font-weight:600;
-    }
+:root{
 
-    .product-card{
-      border:1px solid rgba(0,0,0,.06);
-      border-radius:18px;
-      background:#fff;
-      padding:14px;
-      height:100%;
-      box-shadow:0 8px 20px rgba(16,24,40,.04);
-    }
+--green:#198754;
+--green-dark:#146c43;
+--green-light:#dff6ea;
 
-    .product-title{
-      font-weight:700;
-      font-size:18px;
-      margin-bottom:4px;
-      color:#1f2937;
-    }
+--yellow:#ffc107;
 
-    .product-meta{
-      font-size:13px;
-      color:#6b7280;
-      margin-bottom:4px;
-    }
+--bg:#f4f6f9;
 
-    .product-price{
-      font-size:24px;
-      font-weight:800;
-      color:#198754;
-      margin:8px 0 2px;
-    }
+--card:#ffffff;
 
-    .stock-note{
-      font-size:13px;
-      color:#6b7280;
-      margin-bottom:10px;
-    }
+--text:#212529;
 
-    .buy-btn{
-      width:100%;
-      border:none;
-      border-radius:12px;
-      padding:12px;
-      font-size:14px;
-      font-weight:700;
-      background:#198754;
-      color:#fff;
-      text-align:center;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-    }
+--muted:#6c757d;
 
-    .buy-btn:hover{
-      background:#157347;
-      color:#fff;
-    }
+--border:#e9ecef;
 
-    .buy-btn.disabled{
-      pointer-events:none;
-      background:#cbd5e1;
-      color:#6b7280;
-    }
+}
 
-    .section-title{
-      font-weight:800;
-      margin:0;
-    }
+*{
 
-    .small-note{
-      color:#6b7280;
-      font-size:13px;
-    }
+margin:0;
+padding:0;
+box-sizing:border-box;
 
-    @media (max-width: 768px){
-      .wrap{
-        padding:14px 10px 50px;
-      }
-    }
-  </style>
+}
+
+html{
+
+scroll-behavior:smooth;
+
+}
+
+body{
+
+background:var(--bg);
+
+font-family:
+"Segoe UI",
+Tahoma,
+Geneva,
+Verdana,
+sans-serif;
+
+color:var(--text);
+
+}
+
+/**************************
+TOP APP BAR
+**************************/
+
+.topbar{
+
+position:sticky;
+
+top:0;
+
+z-index:999;
+
+background:linear-gradient(
+180deg,
+var(--green),
+var(--green-dark)
+);
+
+padding:12px 14px;
+
+box-shadow:0 4px 18px rgba(0,0,0,.15);
+
+}
+
+.brand{
+
+font-size:24px;
+
+font-weight:800;
+
+color:#fff;
+
+margin-bottom:12px;
+
+}
+
+/**************************
+SEARCH
+**************************/
+
+.search-box{
+
+background:#fff;
+
+border-radius:14px;
+
+padding:10px;
+
+display:flex;
+
+gap:10px;
+
+align-items:center;
+
+}
+
+.search-input{
+
+border:none;
+
+outline:none;
+
+width:100%;
+
+font-size:15px;
+
+}
+
+.search-btn{
+
+background:var(--green);
+
+border:none;
+
+color:#fff;
+
+padding:10px 18px;
+
+border-radius:10px;
+
+font-weight:700;
+
+transition:.25s;
+
+}
+
+.search-btn:hover{
+
+background:var(--green-dark);
+
+}
+
+/**************************
+QUICK MENU
+**************************/
+
+.quick-menu{
+
+display:flex;
+
+gap:10px;
+
+margin-top:12px;
+
+overflow-x:auto;
+
+padding-bottom:2px;
+
+}
+
+.quick-menu::-webkit-scrollbar{
+
+display:none;
+
+}
+
+.menu-btn{
+
+flex:0 0 auto;
+
+background:rgba(255,255,255,.15);
+
+color:#fff;
+
+padding:10px 16px;
+
+border-radius:30px;
+
+text-decoration:none;
+
+font-size:14px;
+
+font-weight:600;
+
+backdrop-filter:blur(8px);
+
+transition:.25s;
+
+white-space:nowrap;
+
+}
+
+.menu-btn:hover{
+
+background:#fff;
+
+color:var(--green);
+
+}
+
+.logout-btn{
+
+background:var(--yellow);
+
+color:#222;
+
+}
+
+/**************************
+MAIN
+**************************/
+
+.container-app{
+
+max-width:1300px;
+
+margin:auto;
+
+padding:16px;
+
+}
+
+/**************************
+SECTION
+**************************/
+
+.section-title{
+
+font-size:24px;
+
+font-weight:800;
+
+margin-bottom:3px;
+
+}
+
+.section-sub{
+
+font-size:14px;
+
+color:var(--muted);
+
+margin-bottom:18px;
+
+}
+
+/**************************
+CARD
+**************************/
+
+.soft-card{
+
+background:var(--card);
+
+border-radius:20px;
+
+padding:18px;
+
+box-shadow:
+
+0 10px 25px
+
+rgba(0,0,0,.06);
+
+border:1px solid #eef1f5;
+
+}
+
+/**************************
+CHIPS
+**************************/
+
+.chips{
+
+display:flex;
+
+gap:10px;
+
+overflow:auto;
+
+padding-bottom:5px;
+
+margin-bottom:18px;
+
+}
+
+.chips::-webkit-scrollbar{
+
+display:none;
+
+}
+
+.chip{
+
+flex:0 0 auto;
+
+padding:9px 16px;
+
+border-radius:30px;
+
+background:#fff;
+
+border:1px solid #ddd;
+
+font-size:14px;
+
+font-weight:700;
+
+cursor:pointer;
+
+transition:.25s;
+
+white-space:nowrap;
+
+}
+
+.chip.active{
+
+background:var(--green);
+
+color:#fff;
+
+border-color:var(--green);
+
+}
+
+/**************************
+STATS
+**************************/
+
+.stats-card{
+
+background:#eaf5ff;
+
+border-radius:18px;
+
+padding:18px;
+
+}
+
+.stats-number{
+
+font-size:34px;
+
+font-weight:800;
+
+color:var(--green);
+
+}
+
+/**************************
+PRODUCT GRID
+**************************/
+
+.products{
+
+display:grid;
+
+grid-template-columns:
+
+repeat(4,1fr);
+
+gap:18px;
+
+}
+
+/**************************
+RESPONSIVE
+**************************/
+
+@media(max-width:1200px){
+
+.products{
+
+grid-template-columns:
+
+repeat(3,1fr);
+
+}
+
+}
+
+@media(max-width:768px){
+
+.products{
+
+grid-template-columns:
+
+repeat(2,1fr);
+
+gap:14px;
+
+}
+
+.brand{
+
+font-size:21px;
+
+}
+
+.section-title{
+
+font-size:21px;
+
+}
+
+.container-app{
+
+padding:12px;
+
+}
+
+}
+
+@media(max-width:480px){
+
+.products{
+
+grid-template-columns:
+
+repeat(2,1fr);
+
+gap:10px;
+
+}
+
+.brand{
+
+font-size:20px;
+
+}
+
+.search-btn{
+
+padding:10px 12px;
+
+}
+
+.quick-menu{
+
+gap:8px;
+
+}
+
+.menu-btn{
+
+font-size:13px;
+
+padding:9px 14px;
+
+}
+
+.section-title{
+
+font-size:20px;
+
+}
+
+.soft-card{
+
+padding:14px;
+
+}
+
+}
+
+</style>
+
 </head>
+
 <body>
+{{-- =========================
+    TOP HEADER
+========================= --}}
 
-<nav class="navbar navbar-dark topbar">
-  <div class="container-fluid px-3">
-    <span class="navbar-brand fw-bold m-0">ANI-CARE | Resident</span>
+<div class="topbar">
 
-    <div class="d-flex gap-2 flex-wrap">
-      <a href="{{ route('resident.marketplace') }}" class="btn btn-outline-light btn-sm">Marketplace</a>
-      <a href="{{ route('resident.orders.index') }}" class="btn btn-light btn-sm">My Orders</a>
-      <a href="{{ route('resident.profile') }}" class="btn btn-outline-light btn-sm">My Profile</a>
+    <div class="brand">
 
-      <form method="POST" action="{{ route('logout') }}">
-        @csrf
-        <button class="btn btn-warning btn-sm">Logout</button>
-      </form>
+        🌾 ANI-CARE Marketplace
+
     </div>
-  </div>
-</nav>
 
-<div class="wrap">
+    {{-- SEARCH BAR --}}
 
-  @if(session('success'))
-    <div class="alert alert-success">{{ session('success') }}</div>
-  @endif
+    <form
+        method="GET"
+        action="{{ route('resident.marketplace') }}"
+        class="search-box">
 
-  @if($errors->any())
-    <div class="alert alert-danger">{{ $errors->first() }}</div>
-  @endif
+        <i class="bi bi-search text-success fs-5"></i>
 
-  <h3 class="fw-bold mb-0">Marketplace</h3>
-  <div class="text-muted mb-3">Browse rice/palay posts and see miller availability.</div>
+        <input
+            type="text"
+            name="q"
+            value="{{ $q ?? '' }}"
+            class="search-input"
+            placeholder="Search rice, palay, farmer...">
 
-  {{-- Search + Open Millers --}}
-  <div class="row g-3 mb-3">
-    <div class="col-md-7">
-      <div class="soft p-3">
-        <form method="GET" action="{{ route('resident.marketplace') }}" class="row g-2">
-          <div class="col-8">
-            <input
-              class="form-control"
-              name="q"
-              value="{{ $q ?? '' }}"
-              placeholder="Search variety / farmer (e.g., IR64, Juan)">
-          </div>
-          <div class="col-4 d-grid">
-            <button class="btn btn-success">Search</button>
-          </div>
+        <button
+            class="search-btn"
+            type="submit">
+
+            Search
+
+        </button>
+
+    </form>
+
+    {{-- QUICK MENU --}}
+
+    <div class="quick-menu">
+
+        <a
+            href="{{ route('resident.marketplace') }}"
+            class="menu-btn">
+
+            <i class="bi bi-shop"></i>
+
+            Marketplace
+
+        </a>
+
+        <a
+            href="{{ route('resident.orders.index') }}"
+            class="menu-btn">
+
+            <i class="bi bi-bag"></i>
+
+            Orders
+
+        </a>
+
+        <a
+            href="{{ route('resident.profile') }}"
+            class="menu-btn">
+
+            <i class="bi bi-person-circle"></i>
+
+            Profile
+
+        </a>
+
+        <form
+            method="POST"
+            action="{{ route('logout') }}">
+
+            @csrf
+
+            <button
+                class="menu-btn logout-btn"
+                type="submit">
+
+                <i class="bi bi-box-arrow-right"></i>
+
+                Logout
+
+            </button>
+
         </form>
-      </div>
+
     </div>
 
-    <div class="col-md-5">
-      <div class="soft p-3" style="background:#e8f3ff;">
-        <div class="text-muted">Open Millers</div>
-        <div class="fs-2 fw-bold">{{ $openMillersCount ?? 0 }}</div>
-        <div class="text-muted small">Live status today</div>
-      </div>
-    </div>
-  </div>
+</div>
 
-  {{-- Millers --}}
-  <div class="soft p-3 mb-4">
-    <div class="d-flex justify-content-between align-items-center mb-2">
-      <div class="fw-bold">Millers</div>
-      <div class="text-muted small">OPEN / CLOSED</div>
+{{-- =========================
+    MAIN CONTENT
+========================= --}}
+
+<div class="container-app">
+
+@if(session('success'))
+
+<div class="alert alert-success shadow-sm">
+
+{{ session('success') }}
+
+</div>
+
+@endif
+
+@if($errors->any())
+
+<div class="alert alert-danger shadow-sm">
+
+{{ $errors->first() }}
+
+</div>
+
+@endif
+
+<div class="mb-4">
+
+    <div class="section-title">
+
+        🛍 Marketplace
+
     </div>
 
-    <div class="row g-2">
-      @forelse(($millers ?? []) as $m)
-        <div class="col-md-4">
-          <div class="border rounded-3 p-2 d-flex justify-content-between align-items-center">
-            <div>
-              <div class="fw-semibold">{{ $m->fullname ?? $m->username }}</div>
-              <div class="text-muted small">{{ '@'.$m->username }}</div>
+    <div class="section-sub">
+
+        Browse rice and palay products directly from registered farmers.
+
+    </div>
+
+</div>
+
+{{-- =========================
+    FILTER CHIPS
+========================= --}}
+
+<div class="chips">
+
+    <div class="chip active">
+
+        All Products
+
+    </div>
+
+    <div class="chip">
+
+        🌾 Rice
+
+    </div>
+
+    <div class="chip">
+
+        🌱 Palay
+
+    </div>
+
+    <div class="chip">
+
+        ⭐ Latest
+
+    </div>
+
+    <div class="chip">
+
+        💰 Cheapest
+
+    </div>
+
+    <div class="chip">
+
+        🚜 Farmers
+
+    </div>
+
+</div>
+
+{{-- =========================
+    TOP INFO
+========================= --}}
+
+<div class="row g-3 mb-4">
+
+    <div class="col-lg-4">
+
+        <div class="stats-card h-100">
+
+            <small class="text-muted">
+
+                Open Millers
+
+            </small>
+
+            <div class="stats-number">
+
+                {{ $openMillersCount ?? 0 }}
+
             </div>
 
-            @if($m->is_open)
-              <span class="pill bg-success text-white">OPEN</span>
-            @else
-              <span class="pill bg-secondary text-white">CLOSED</span>
-            @endif
-          </div>
+            <div class="text-muted">
+
+                Available today
+
+            </div>
+
         </div>
-      @empty
-        <div class="text-muted">No millers found.</div>
-      @endforelse
+
     </div>
-  </div>
 
-  {{-- Products --}}
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h4 class="section-title">Rice / Palay Posts</h4>
-    <span class="small-note">Latest posts</span>
-  </div>
+    <div class="col-lg-8">
 
-  <div class="row g-3">
-    @forelse(($products ?? []) as $p)
-      @php
-        $img = !empty($p->photo_path) ? asset('storage/'.$p->photo_path) : null;
-        $stock = (float) ($p->kilos_available ?? 0);
-        $price = (float) ($p->price_per_kg ?? 0);
-      @endphp
+        <div class="soft-card h-100">
 
-      <div class="col-md-4">
-        <div class="product-card">
+            <div class="d-flex justify-content-between align-items-center mb-3">
 
-          @if($img)
-            <img src="{{ $img }}" class="product-img mb-3" alt="product">
-          @else
-            <div class="no-photo mb-3">No photo</div>
-          @endif
+                <strong>
 
-          <div class="product-title">{{ $p->name }}</div>
+                    ⚙️ Available Millers
 
-          <div class="product-meta">
-            Type:
-            <span class="badge bg-secondary text-uppercase">{{ $p->type ?? '-' }}</span>
-          </div>
+                </strong>
 
-          <div class="product-meta">
-            By {{ $p->user->fullname ?? $p->user->username ?? 'Unknown' }}
-          </div>
+                <small class="text-muted">
 
-          <div class="product-price">₱{{ number_format($price, 2) }} / kg</div>
-          <div class="stock-note">{{ number_format($stock, 2) }} kg available</div>
+                    LIVE
 
-          <div class="d-grid gap-2">
+                </small>
 
-    <a href="{{ route('resident.product.show', $p->id) }}"
-       class="btn btn-outline-primary">
-        👁 View Details
-    </a>
+            </div>
 
-    <a href="{{ route('resident.checkout.show', $p->id) }}"
-       class="buy-btn {{ $stock <= 0 ? 'disabled' : '' }}">
-        🛒 Buy Now
-    </a>
+            <div class="row g-2">
 
-</div>
+                @forelse(($millers ?? []) as $m)
+
+                <div class="col-md-6">
+
+                    <div class="border rounded-4 p-3 d-flex justify-content-between align-items-center">
+
+                        <div>
+
+                            <div class="fw-bold">
+
+                                {{ $m->fullname ?? $m->username }}
+
+                            </div>
+
+                            <small class="text-muted">
+
+                                {{ '@'.$m->username }}
+
+                            </small>
+
+                        </div>
+
+                        @if($m->is_open)
+
+                        <span class="badge bg-success rounded-pill">
+
+                            OPEN
+
+                        </span>
+
+                        @else
+
+                        <span class="badge bg-secondary rounded-pill">
+
+                            CLOSED
+
+                        </span>
+
+                        @endif
+
+                    </div>
+
+                </div>
+
+                @empty
+
+                <div class="col-12">
+
+                    <div class="text-muted">
+
+                        No millers available.
+
+                    </div>
+
+                </div>
+
+                @endforelse
+
+            </div>
+
         </div>
-      </div>
-    @empty
-      <div class="col-12">
-        <div class="soft p-4 text-center text-muted">No products found.</div>
-      </div>
-    @endforelse
-  </div>
 
-  <div class="pagination-wrap mt-4 d-flex justify-content-center">
-    {{ $products->links() }}
-  </div>
+    </div>
 
 </div>
+
+{{-- =========================
+    PRODUCTS SECTION
+========================= --}}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+
+    <div>
+
+        <div class="section-title">
+
+            🌾 Rice & Palay
+
+        </div>
+
+        <div class="section-sub">
+
+            Latest farmer listings
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="products">
+  @forelse(($products ?? []) as $p)
+
+@php
+
+$img = !empty($p->photo_path)
+    ? asset('storage/'.$p->photo_path)
+    : null;
+
+$stock = (float)($p->kilos_available ?? 0);
+
+$price = (float)($p->price_per_kg ?? 0);
+
+@endphp
+
+<div class="product-item">
+
+<div class="product-card">
+
+    {{-- ==========================
+        PRODUCT IMAGE
+    ========================== --}}
+
+    <div class="position-relative">
+
+        @if($img)
+
+            <img
+                src="{{ $img }}"
+                class="product-image"
+                alt="{{ $p->name }}">
+
+        @else
+
+            <div class="product-image d-flex align-items-center justify-content-center bg-light">
+
+                <div class="text-center text-muted">
+
+                    <i class="bi bi-image fs-1"></i>
+
+                    <div class="small">
+
+                        No Photo
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        @endif
+
+        {{-- TYPE BADGE --}}
+
+        <span class="product-badge">
+
+            {{ strtoupper($p->type) }}
+
+        </span>
+
+        {{-- FAVORITE BUTTON --}}
+
+        <button
+            class="favorite-btn"
+            type="button">
+
+            <i class="bi bi-heart"></i>
+
+        </button>
+
+    </div>
+
+    {{-- ==========================
+        PRODUCT DETAILS
+    ========================== --}}
+
+    <div class="product-content">
+
+        <div class="product-name">
+
+            {{ $p->name }}
+
+        </div>
+
+        <div class="seller-name">
+
+            👨‍🌾 {{ $p->user->fullname ?? $p->user->username ?? 'Unknown Farmer' }}
+
+        </div>
+
+        <div class="stock-text">
+
+            📦 {{ number_format($stock,2) }} kg available
+
+        </div>
+
+        <div class="price-row">
+
+            <div>
+
+                <div class="price">
+
+                    ₱{{ number_format($price,2) }}
+
+                </div>
+
+                <small class="text-muted">
+
+                    per kilogram
+
+                </small>
+
+            </div>
+
+            @if($stock>0)
+
+                <span class="stock-badge">
+
+                    In Stock
+
+                </span>
+
+            @else
+
+                <span class="stock-badge out">
+
+                    Sold Out
+
+                </span>
+
+            @endif
+
+        </div>
+
+        {{-- ==========================
+            ACTION BUTTONS
+        ========================== --}}
+
+        <div class="mt-3 d-grid gap-2">
+
+            <a
+                href="{{ route('resident.product.show',$p->id) }}"
+                class="btn btn-outline-success rounded-3">
+
+                <i class="bi bi-eye"></i>
+
+                View Details
+
+            </a>
+
+            <a
+                href="{{ route('resident.checkout.show',$p->id) }}"
+                class="btn btn-success rounded-3 {{ $stock<=0 ? 'disabled' : '' }}">
+
+                <i class="bi bi-cart-fill"></i>
+
+                Buy Now
+
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+</div>
+
+@empty
+
+<div class="col-12">
+
+<div class="soft-card text-center py-5">
+
+<i class="bi bi-box-seam display-3 text-secondary"></i>
+
+<h4 class="mt-3">
+
+No Products Found
+
+</h4>
+
+<p class="text-muted">
+
+There are currently no rice or palay products available.
+
+</p>
+
+</div>
+
+</div>
+
+@endforelse
+</div>
+
+{{-- ===========================
+PAGINATION
+=========================== --}}
+
+@if(method_exists($products,'links'))
+
+<div class="d-flex justify-content-center mt-4 mb-5">
+
+    {{ $products->links() }}
+
+</div>
+
+@endif
+
+</div> {{-- END container-app --}}
+
+
+{{-- ===========================
+BOTTOM MOBILE NAVIGATION
+=========================== --}}
+
+<div class="bottom-nav d-lg-none">
+
+    <a href="{{ route('resident.marketplace') }}"
+       class="bottom-item active">
+
+        <i class="bi bi-shop"></i>
+
+        <span>Shop</span>
+
+    </a>
+
+    <a href="{{ route('resident.orders.index') }}"
+       class="bottom-item">
+
+        <i class="bi bi-bag"></i>
+
+        <span>Orders</span>
+
+    </a>
+
+    <a href="{{ route('resident.profile') }}"
+       class="bottom-item">
+
+        <i class="bi bi-person-circle"></i>
+
+        <span>Profile</span>
+
+    </a>
+
+</div>
+
+
+<style>
+
+/***************************************************
+SHOPPE STYLE PRODUCT CARD
+****************************************************/
+
+.product-card{
+
+background:#fff;
+
+border-radius:18px;
+
+overflow:hidden;
+
+box-shadow:0 5px 15px rgba(0,0,0,.08);
+
+transition:.25s;
+
+height:100%;
+
+display:flex;
+
+flex-direction:column;
+
+}
+
+.product-card:hover{
+
+transform:translateY(-4px);
+
+box-shadow:0 12px 25px rgba(0,0,0,.15);
+
+}
+
+.product-image{
+
+width:100%;
+
+aspect-ratio:1/1;
+
+object-fit:cover;
+
+background:#f2f2f2;
+
+}
+
+.product-content{
+
+padding:14px;
+
+display:flex;
+
+flex-direction:column;
+
+flex:1;
+
+}
+
+.product-name{
+
+font-weight:700;
+
+font-size:16px;
+
+line-height:1.3;
+
+height:42px;
+
+overflow:hidden;
+
+margin-bottom:6px;
+
+}
+
+.seller-name{
+
+font-size:13px;
+
+color:#666;
+
+margin-bottom:4px;
+
+}
+
+.stock-text{
+
+font-size:13px;
+
+color:#888;
+
+margin-bottom:10px;
+
+}
+
+.price-row{
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+margin-top:auto;
+
+}
+
+.price{
+
+font-size:23px;
+
+font-weight:800;
+
+color:#198754;
+
+}
+
+.product-badge{
+
+position:absolute;
+
+left:10px;
+
+top:10px;
+
+background:#198754;
+
+color:#fff;
+
+padding:5px 10px;
+
+font-size:11px;
+
+font-weight:700;
+
+border-radius:30px;
+
+}
+
+.favorite-btn{
+
+position:absolute;
+
+right:10px;
+
+top:10px;
+
+width:34px;
+
+height:34px;
+
+border:none;
+
+background:#fff;
+
+border-radius:50%;
+
+box-shadow:0 2px 8px rgba(0,0,0,.15);
+
+}
+
+.favorite-btn i{
+
+color:#198754;
+
+}
+
+.stock-badge{
+
+padding:5px 10px;
+
+background:#198754;
+
+color:#fff;
+
+border-radius:20px;
+
+font-size:11px;
+
+font-weight:700;
+
+}
+
+.stock-badge.out{
+
+background:#dc3545;
+
+}
+
+
+/***************************************************
+BOTTOM NAVIGATION
+****************************************************/
+
+.bottom-nav{
+
+position:fixed;
+
+bottom:0;
+
+left:0;
+
+right:0;
+
+height:70px;
+
+background:#fff;
+
+display:flex;
+
+justify-content:space-around;
+
+align-items:center;
+
+box-shadow:0 -5px 20px rgba(0,0,0,.10);
+
+z-index:9999;
+
+}
+
+.bottom-item{
+
+display:flex;
+
+flex-direction:column;
+
+align-items:center;
+
+justify-content:center;
+
+text-decoration:none;
+
+font-size:12px;
+
+font-weight:600;
+
+color:#777;
+
+}
+
+.bottom-item i{
+
+font-size:22px;
+
+margin-bottom:3px;
+
+}
+
+.bottom-item.active{
+
+color:#198754;
+
+}
+
+
+/***************************************************
+RESPONSIVE
+****************************************************/
+
+@media(max-width:991px){
+
+.container-app{
+
+padding-bottom:90px;
+
+}
+
+.products{
+
+display:grid;
+
+grid-template-columns:repeat(2,1fr);
+
+gap:12px;
+
+}
+
+}
+
+@media(max-width:575px){
+
+.products{
+
+grid-template-columns:repeat(2,1fr);
+
+gap:10px;
+
+}
+
+.product-name{
+
+font-size:14px;
+
+height:38px;
+
+}
+
+.price{
+
+font-size:19px;
+
+}
+
+.product-content{
+
+padding:10px;
+
+}
+
+.btn{
+
+font-size:13px;
+
+padding:9px;
+
+}
+
+}
+
+@media(min-width:992px){
+
+.bottom-nav{
+
+display:none;
+
+}
+
+.products{
+
+grid-template-columns:repeat(4,1fr);
+
+}
+
+}
+
+</style>
+
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
+
 </html>

@@ -11,17 +11,21 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     protected $fillable = [
-        'fullname',
-        'username',
-        'email',
-        'barangay',
-        'password',
-        'role',
-        'is_approved',
-        'approved_at',
-        'is_open',
-        'latitude',
-        'longitude',
+    'fullname',
+    'username',
+    'email',
+    'barangay',
+    'rsbsa_no',
+    'is_icc_ip',
+    'icc_ip_name',
+    'membership',
+    'password',
+    'role',
+    'is_approved',
+    'approved_at',
+    'is_open',
+    'latitude',
+    'longitude',
     ];
 
     protected $hidden = [
@@ -33,6 +37,7 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'approved_at'       => 'datetime',
         'is_approved'       => 'boolean',
+        'is_icc_ip'         => 'boolean',
         'is_open'           => 'boolean',
         'password'          => 'hashed', // Laravel 10+
         'latitude'          => 'float',

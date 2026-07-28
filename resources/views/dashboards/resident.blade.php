@@ -1,587 +1,1015 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <title>Resident Dashboard | ANI-CARE</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- Mobile responsive helpers -->
-  <style>
-    html { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-    *, *::before, *::after { box-sizing: inherit; }
-    body { min-height: 100vh; margin: 0; }
-    img, video, iframe, svg, canvas { max-width: 100%; height: auto; }
-    .container, .container-fluid { width: 100% !important; max-width: 100% !important; padding-left: 1rem !important; padding-right: 1rem !important; }
-    .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-    .table-responsive table { min-width: 100%; }
-    .leaflet-container, #registrationMap, #residentMap, #orderMap, #trackMap { width: 100% !important; max-width: 100%; }
-    .card, .card-body { word-wrap: break-word; }
-    .btn, .form-control, .form-select, .input-group, .form-check-input { min-width: 0; }
-    @media (max-width: 768px) {
-      .navbar, .topbar { flex-wrap: wrap !important; }
-      .navbar-brand, .navbar-nav, .btn { width: 100% !important; text-align: center !important; }
-      .table-responsive { margin-left: -1rem !important; margin-right: -1rem !important; padding-left: 1rem !important; padding-right: 1rem !important; }
-    }
-  </style>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 
-  <style>
-    *{
-      margin:0;
-      padding:0;
-      box-sizing:border-box;
-    }
+<meta charset="UTF-8">
 
-    :root{
-      --primary:#ee4d2d;
-      --primary-dark:#d94224;
-      --accent:#fff1ec;
-      --bg:#f5f5f5;
-      --card:#ffffff;
-      --text:#222;
-      --muted:#6b7280;
-      --border:#e5e7eb;
-      --shadow:0 4px 14px rgba(15,23,42,.06);
-    }
+<meta name="viewport"
+      content="width=device-width, initial-scale=1">
 
-    body{
-      font-family:"Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      background:var(--bg);
-      color:var(--text);
-    }
+<title>Resident Dashboard | ANI-CARE</title>
 
-    a{
-      text-decoration:none;
-      color:inherit;
-    }
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet">
 
-    .top-header{
-      background:#198754;
-      color:#fff;
-      box-shadow:0 4px 14px rgba(0,0,0,.08);
-    }
+<link rel="stylesheet"
+href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 
-    .top-header-inner{
-      width:100%;
-      padding:10px 14px;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:12px;
-      flex-wrap:wrap;
-    }
+<link rel="stylesheet"
+href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 
-    .brand{
-      font-size:18px;
-      font-weight:800;
-      color:#fff;
-    }
+<style>
 
-    .header-actions{
-      display:flex;
-      align-items:center;
-      gap:8px;
-      flex-wrap:wrap;
-    }
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
 
-    .header-chip{
-      background:#ffffff;
-      color:#111827;
-      border:1px solid rgba(255,255,255,.25);
-      padding:7px 12px;
-      border-radius:4px;
-      font-size:13px;
-      font-weight:600;
-    }
+body{
 
-    .header-chip.active{
-      border:1px solid #ffffff;
-      background:transparent;
-      color:#fff;
-    }
+font-family:'Segoe UI',sans-serif;
+background:#f3f5f9;
+color:#222;
 
-    .logout-btn{
-      border:none;
-      background:#facc15;
-      color:#111827;
-      padding:7px 12px;
-      border-radius:4px;
-      font-size:13px;
-      font-weight:700;
-    }
+}
 
-    .page-wrap{
-      max-width:1120px;
-      margin:0 auto;
-      padding:12px 14px 40px;
-    }
+/*==========================
+TOP HEADER
+==========================*/
 
-    .welcome-box{
-      margin-bottom:14px;
-    }
+.top-header{
 
-    .welcome-title{
-      font-size:24px;
-      font-weight:800;
-      color:#111827;
-      margin-bottom:4px;
-    }
+background:#198754;
+color:#fff;
+padding:18px 0;
+box-shadow:0 3px 10px rgba(0,0,0,.12);
 
-    .welcome-sub{
-      font-size:13px;
-      color:var(--muted);
-    }
+}
 
-    .stats-strip{
-      display:grid;
-      grid-template-columns:repeat(4, 1fr);
-      gap:12px;
-      margin-bottom:12px;
-    }
+.header-wrapper{
 
-    .stat-box{
-      background:var(--card);
-      border:1px solid var(--border);
-      border-radius:14px;
-      padding:16px;
-      box-shadow:var(--shadow);
-    }
+max-width:1200px;
+margin:auto;
+padding:0 18px;
 
-    .stat-label{
-      color:var(--muted);
-      font-size:12px;
-      margin-bottom:6px;
-    }
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:20px;
+flex-wrap:wrap;
 
-    .stat-number{
-      font-size:18px;
-      font-weight:800;
-      color:#111827;
-      line-height:1.1;
-      margin-bottom:4px;
-    }
+}
 
-    .stat-foot{
-      font-size:12px;
-      color:#6b7280;
-    }
+.brand{
 
-    .dashboard-grid{
-      display:grid;
-      grid-template-columns:1.65fr .85fr;
-      gap:12px;
-      margin-bottom:12px;
-    }
+font-size:28px;
+font-weight:700;
 
-    .bottom-grid{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:12px;
-      margin-bottom:12px;
-    }
+}
 
-    .section-card{
-      background:var(--card);
-      border:1px solid var(--border);
-      border-radius:14px;
-      padding:14px;
-      box-shadow:var(--shadow);
-    }
+/*==========================
+NAVIGATION
+==========================*/
 
-    .section-head{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:10px;
-      margin-bottom:10px;
-      flex-wrap:wrap;
-    }
+.header-actions{
 
-    .section-head h3,
-    .section-head h4{
-      font-size:16px;
-      font-weight:800;
-      margin:0;
-      color:#111827;
-    }
+display:flex;
+gap:10px;
+flex-wrap:wrap;
 
-    .section-note{
-      color:var(--muted);
-      font-size:11px;
-    }
+}
 
-    #map{
-      width:100%;
-      height:330px;
-      border-radius:12px;
-      overflow:hidden;
-      border:1px solid var(--border);
-    }
+.header-actions a,
+.logout-btn{
 
-    .announcement{
-      padding:12px 14px;
-      border-radius:10px;
-      border:1px solid #bfd7ff;
-      background:#f8fbff;
-      margin-bottom:10px;
-    }
+padding:10px 18px;
+border-radius:10px;
+font-weight:600;
+text-decoration:none;
+transition:.3s;
 
-    .announcement:last-child{
-      margin-bottom:0;
-    }
+}
 
-    .announcement .title{
-      font-weight:800;
-      margin-bottom:4px;
-      color:#111827;
-      font-size:14px;
-    }
+.header-chip{
 
-    .announcement .meta{
-      color:var(--muted);
-      font-size:11px;
-      margin-top:6px;
-    }
+background:#fff;
+color:#222;
 
-    .list-item{
-      display:flex;
-      justify-content:space-between;
-      align-items:flex-start;
-      gap:10px;
-      padding:12px 0;
-      border-bottom:1px solid var(--border);
-    }
+}
 
-    .list-item:last-child{
-      border-bottom:none;
-      padding-bottom:0;
-    }
+.header-chip.active{
 
-    .list-item:first-child{
-      padding-top:0;
-    }
+background:#157347;
+color:#fff;
 
-    .item-title{
-      font-weight:700;
-      color:#111827;
-      margin-bottom:2px;
-      font-size:14px;
-    }
+}
 
-    .item-sub{
-      color:var(--muted);
-      font-size:12px;
-    }
+.logout-btn{
 
-    .price{
-      color:#198754;
-      font-weight:800;
-      white-space:nowrap;
-      font-size:14px;
-    }
+background:#ffc107;
+border:none;
 
-    .pill{
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-      border-radius:999px;
-      padding:5px 10px;
-      font-size:11px;
-      font-weight:800;
-    }
+}
 
-    .pill-open{
-      background:#dcfce7;
-      color:#166534;
-    }
+.logout-btn:hover{
 
-    .pill-closed{
-      background:#e5e7eb;
-      color:#4b5563;
-    }
+background:#e0a800;
 
-    .empty-state{
-      text-align:center;
-      color:var(--muted);
-      padding:18px 0;
-      font-size:13px;
-    }
+}
 
-    .browse-btn{
-      border:1px solid #198754;
-      background:#fff;
-      color:#198754;
-      font-weight:600;
-      padding:6px 12px;
-      border-radius:4px;
-      font-size:12px;
-    }
+/*==========================
+PAGE
+==========================*/
 
-    @media (max-width: 1100px){
-      .stats-strip{
-        grid-template-columns:repeat(2, 1fr);
-      }
+.page-wrap{
 
-      .dashboard-grid,
-      .bottom-grid{
-        grid-template-columns:1fr;
-      }
-    }
+max-width:1200px;
+margin:auto;
+padding:25px 15px 50px;
 
-    @media (max-width: 768px){
-      .stats-strip{
-        grid-template-columns:1fr;
-      }
+}
 
-      .welcome-title{
-        font-size:22px;
-      }
+/*==========================
+WELCOME
+==========================*/
 
-      #map{
-        height:280px;
-      }
+.welcome-box{
 
-      .top-header-inner{
-        flex-direction:column;
-        align-items:flex-start;
-      }
+margin-bottom:25px;
 
-      .header-actions{
-        width:100%;
-      }
-    }
-  </style>
+}
+
+.welcome-title{
+
+font-size:38px;
+font-weight:700;
+
+}
+
+.welcome-sub{
+
+font-size:17px;
+color:#666;
+
+}
+
+/*==========================
+STATS
+==========================*/
+
+.stats-strip{
+
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:18px;
+
+margin-bottom:25px;
+
+}
+
+.stat-box{
+
+background:#fff;
+
+border-radius:18px;
+
+padding:22px;
+
+box-shadow:0 8px 20px rgba(0,0,0,.08);
+
+transition:.3s;
+
+}
+
+.stat-box:hover{
+
+transform:translateY(-3px);
+
+}
+
+.stat-label{
+
+font-size:15px;
+color:#666;
+
+}
+
+.stat-number{
+
+font-size:34px;
+font-weight:700;
+color:#198754;
+
+}
+
+.stat-foot{
+
+font-size:14px;
+color:#888;
+
+}
+
+/*==========================
+CARDS
+==========================*/
+
+.section-card{
+
+background:#fff;
+
+border:none;
+
+border-radius:18px;
+
+padding:20px;
+
+box-shadow:0 8px 20px rgba(0,0,0,.08);
+
+margin-bottom:20px;
+
+}
+
+.section-head{
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+margin-bottom:15px;
+
+flex-wrap:wrap;
+
+}
+
+.section-head h3,
+.section-head h4{
+
+font-weight:700;
+margin:0;
+
+}
+
+.section-note{
+
+font-size:14px;
+
+color:#777;
+
+}
+
+/*==========================
+MAP
+==========================*/
+
+#map{
+
+width:100%;
+
+height:400px;
+
+border-radius:15px;
+
+overflow:hidden;
+
+}
+
+/*==========================
+MOBILE
+==========================*/
+
+@media(max-width:991px){
+
+.stats-strip{
+
+grid-template-columns:repeat(2,1fr);
+
+}
+
+}
+
+@media(max-width:768px){
+
+.header-wrapper{
+
+flex-direction:column;
+
+align-items:flex-start;
+
+}
+
+.header-actions{
+
+display:grid;
+
+grid-template-columns:repeat(2,1fr);
+
+width:100%;
+
+}
+
+.header-actions a,
+.logout-btn{
+
+text-align:center;
+
+width:100%;
+
+}
+
+.brand{
+
+font-size:24px;
+
+}
+
+.welcome-title{
+
+font-size:30px;
+
+}
+
+.stats-strip{
+
+grid-template-columns:repeat(2,1fr);
+
+gap:12px;
+
+}
+
+.stat-box{
+
+padding:18px;
+
+}
+
+.stat-number{
+
+font-size:28px;
+
+}
+
+#map{
+
+height:260px;
+
+}
+
+}
+
+@media(max-width:576px){
+
+.stats-strip{
+
+grid-template-columns:1fr;
+
+}
+
+.welcome-title{
+
+font-size:26px;
+
+}
+
+.welcome-sub{
+
+font-size:15px;
+
+}
+
+}
+
+</style>
+
 </head>
+
 <body>
 
 @php
-  $residentName = $user->fullname ?? $user->username ?? 'Resident';
+
+$residentName = $user->fullname ?? $user->username ?? 'Resident';
+
 @endphp
 
 <header class="top-header">
-  <div class="top-header-inner">
-    <div class="brand">ANI-CARE | Resident</div>
 
-    <div class="header-actions">
-      <a href="{{ route('resident.marketplace') }}" class="header-chip active">Marketplace</a>
-      <a href="{{ route('resident.orders.index') }}" class="header-chip">My Orders</a>
-      <a href="{{ route('resident.profile') }}" class="header-chip">My Profile</a>
+<div class="header-wrapper">
 
-      <form method="POST" action="{{ route('logout') }}" class="m-0">
-        @csrf
-        <button type="submit" class="logout-btn">Logout</button>
-      </form>
-    </div>
-  </div>
+<div class="brand">
+
+ANI-CARE | Resident
+
+</div>
+
+<div class="header-actions">
+
+<a href="{{ route('resident.marketplace') }}"
+class="header-chip active">
+
+<i class="bi bi-shop"></i>
+
+Marketplace
+
+</a>
+
+<a href="{{ route('resident.orders.index') }}"
+class="header-chip">
+
+<i class="bi bi-bag"></i>
+
+My Orders
+
+</a>
+
+<a href="{{ route('resident.profile') }}"
+class="header-chip">
+
+<i class="bi bi-person-circle"></i>
+
+My Profile
+
+</a>
+
+<form method="POST"
+action="{{ route('logout') }}">
+
+@csrf
+
+<button class="logout-btn">
+
+<i class="bi bi-box-arrow-right"></i>
+
+Logout
+
+</button>
+
+</form>
+
+</div>
+
+</div>
+
 </header>
 
 <div class="page-wrap">
 
-  @if(session('success'))
-    <div class="alert alert-success border-0 shadow-sm mb-3">{{ session('success') }}</div>
-  @endif
+@if(session('success'))
 
-  @if($errors->any())
-    <div class="alert alert-danger border-0 shadow-sm mb-3">{{ $errors->first() }}</div>
-  @endif
+<div class="alert alert-success shadow-sm">
 
-  <div class="welcome-box">
-    <div class="welcome-title">Welcome, {{ $residentName }}!</div>
-    <div class="welcome-sub">View farmers, millers, marketplace posts, orders, and local announcements.</div>
-  </div>
-
-  <section class="stats-strip">
-    <div class="stat-box">
-      <div class="stat-label">Open Millers</div>
-      <div class="stat-number">{{ $openMillersCount ?? 0 }}</div>
-      <div class="stat-foot">Live status today</div>
-    </div>
-
-    <div class="stat-box">
-      <div class="stat-label">Marketplace Posts</div>
-      <div class="stat-number">{{ $marketplaceCount ?? 0 }}</div>
-      <div class="stat-foot">Active rice and palay listings</div>
-    </div>
-
-    <div class="stat-box">
-      <div class="stat-label">My Orders</div>
-      <div class="stat-number">{{ $myOrdersCount ?? 0 }}</div>
-      <div class="stat-foot">Your placed orders</div>
-    </div>
-
-    <div class="stat-box">
-      <div class="stat-label">Announcements</div>
-      <div class="stat-number">{{ isset($announcements) ? $announcements->count() : 0 }}</div>
-      <div class="stat-foot">Latest updates for residents</div>
-    </div>
-  </section>
-
-  <section class="dashboard-grid">
-    <div class="section-card">
-      <div class="section-head">
-        <div>
-          <h3>Allacapan Farmers & Millers Map</h3>
-          <div class="section-note">Click markers to view farmer and miller details.</div>
-        </div>
-
-        <div class="d-flex flex-wrap gap-2">
-          <span class="pill pill-open">🌾 Farmer</span>
-          <span class="pill" style="background:#dbeafe;color:#1d4ed8;">⚙️ Miller</span>
-        </div>
-      </div>
-
-      <div id="map"></div>
-    </div>
-
-    <div class="section-card">
-      <div class="section-head">
-        <div>
-          <h4>Announcements</h4>
-          <div class="section-note">Latest updates for residents</div>
-        </div>
-      </div>
-
-      @if(isset($announcements) && $announcements->count())
-        @foreach($announcements as $a)
-          <div class="announcement">
-            <div class="title">{{ $a->title }}</div>
-            <div>{{ $a->message }}</div>
-            <div class="meta">Posted: {{ $a->created_at?->format('Y-m-d H:i') }}</div>
-          </div>
-        @endforeach
-      @else
-        <div class="empty-state">No announcements available.</div>
-      @endif
-    </div>
-  </section>
-
-  <section class="bottom-grid">
-    <div class="section-card">
-      <div class="section-head">
-        <div>
-          <h4>Millers Status</h4>
-          <div class="section-note">Open and closed millers</div>
-        </div>
-        <span class="section-note">Live updates</span>
-      </div>
-
-      @forelse(($millers ?? []) as $m)
-        <div class="list-item">
-          <div>
-            <div class="item-title">{{ $m->fullname ?? $m->username }}</div>
-            <div class="item-sub">{{ '@'.$m->username }}</div>
-          </div>
-
-          @if($m->is_open)
-            <span class="pill pill-open">OPEN</span>
-          @else
-            <span class="pill pill-closed">CLOSED</span>
-          @endif
-        </div>
-      @empty
-        <div class="empty-state">No millers found.</div>
-      @endforelse
-    </div>
-
-    <div class="section-card">
-      <div class="section-head">
-        <div>
-          <h4>Latest Farmer Posts</h4>
-          <div class="section-note">Rice and palay listings</div>
-        </div>
-        <a href="{{ route('resident.marketplace') }}" class="browse-btn">Browse</a>
-      </div>
-
-      @forelse(($products ?? []) as $p)
-        <div class="list-item">
-          <div>
-            <div class="item-title">{{ $p->name }}</div>
-            <div class="item-sub">
-              By {{ $p->user->fullname ?? $p->user->username ?? '-' }}
-              • Stock: {{ $p->kilos_available ?? $p->kilos ?? 0 }} kg
-            </div>
-          </div>
-          <div class="price">₱{{ number_format((float)($p->price_per_kg ?? $p->price ?? 0), 2) }}</div>
-        </div>
-      @empty
-        <div class="empty-state">No marketplace posts yet.</div>
-      @endforelse
-    </div>
-  </section>
+{{ session('success') }}
 
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+@endif
+
+@if($errors->any())
+
+<div class="alert alert-danger shadow-sm">
+
+{{ $errors->first() }}
+
+</div>
+
+@endif
+
+<div class="welcome-box">
+
+<h1 class="welcome-title">
+
+Welcome, {{ $residentName }}!
+
+</h1>
+
+<div class="welcome-sub">
+
+View farmers, millers, marketplace listings, orders and local announcements.
+
+</div>
+
+</div>
+
+<section class="stats-strip">
+  <div class="stat-box">
+
+    <div class="stat-label">
+
+        <i class="bi bi-gear-fill text-success me-1"></i>
+
+        Open Millers
+
+    </div>
+
+    <div class="stat-number">
+
+        {{ $openMillersCount ?? 0 }}
+
+    </div>
+
+    <div class="stat-foot">
+
+        Live status today
+
+    </div>
+
+</div>
+
+<div class="stat-box">
+
+    <div class="stat-label">
+
+        <i class="bi bi-shop text-success me-1"></i>
+
+        Marketplace Posts
+
+    </div>
+
+    <div class="stat-number">
+
+        {{ $marketplaceCount ?? 0 }}
+
+    </div>
+
+    <div class="stat-foot">
+
+        Active rice and palay listings
+
+    </div>
+
+</div>
+
+<div class="stat-box">
+
+    <div class="stat-label">
+
+        <i class="bi bi-bag-check-fill text-success me-1"></i>
+
+        My Orders
+
+    </div>
+
+    <div class="stat-number">
+
+        {{ $myOrdersCount ?? 0 }}
+
+    </div>
+
+    <div class="stat-foot">
+
+        Orders you've placed
+
+    </div>
+
+</div>
+
+<div class="stat-box">
+
+    <div class="stat-label">
+
+        <i class="bi bi-megaphone-fill text-success me-1"></i>
+
+        Announcements
+
+    </div>
+
+    <div class="stat-number">
+
+        {{ isset($announcements) ? $announcements->count() : 0 }}
+
+    </div>
+
+    <div class="stat-foot">
+
+        Latest updates
+
+    </div>
+
+</div>
+
+</section>
+
+<div class="row g-4">
+
+    <!-- LEFT COLUMN -->
+
+    <div class="col-lg-8">
+
+        <div class="section-card">
+
+            <div class="section-head">
+
+                <div>
+
+                    <h3>
+
+                        🗺️ Allacapan Farmers & Millers Map
+
+                    </h3>
+
+                    <div class="section-note">
+
+                        Click the markers to view farmer and miller information.
+
+                    </div>
+
+                </div>
+
+                <div class="d-flex flex-wrap gap-2">
+
+                    <span class="badge bg-success px-3 py-2">
+
+                        🌾 Farmer
+
+                    </span>
+
+                    <span class="badge bg-primary px-3 py-2">
+
+                        ⚙️ Miller
+
+                    </span>
+
+                </div>
+
+            </div>
+
+            <div id="map"></div>
+
+        </div>
+
+        <div class="section-card">
+
+            <div class="section-head">
+
+                <div>
+
+                    <h3>
+
+                        📢 Announcements
+
+                    </h3>
+
+                    <div class="section-note">
+
+                        Latest updates for residents
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            @if(isset($announcements) && $announcements->count())
+
+                @foreach($announcements as $a)
+
+                    <div class="card mb-3 border-0 shadow-sm">
+
+                        <div class="card-body">
+
+                            <h5 class="fw-bold text-success">
+
+                                {{ $a->title }}
+
+                            </h5>
+
+                            <p class="mb-2">
+
+                                {{ $a->message }}
+
+                            </p>
+
+                            <small class="text-muted">
+
+                                <i class="bi bi-clock"></i>
+
+                                Posted:
+
+                                {{ $a->created_at?->format('F d, Y h:i A') }}
+
+                            </small>
+
+                        </div>
+
+                    </div>
+
+                @endforeach
+
+            @else
+
+                <div class="text-center py-5 text-muted">
+
+                    <i class="bi bi-megaphone display-5"></i>
+
+                    <p class="mt-3">
+
+                        No announcements available.
+
+                    </p>
+
+                </div>
+
+            @endif
+
+        </div>
+
+    </div>
+
+    <!-- RIGHT COLUMN -->
+
+    <div class="col-lg-4">
+      <div class="section-card">
+
+    <div class="section-head">
+
+        <div>
+
+            <h4>
+
+                ⚙️ Millers Status
+
+            </h4>
+
+            <div class="section-note">
+
+                Live updates
+
+            </div>
+
+        </div>
+
+    </div>
+
+    @forelse(($millers ?? []) as $m)
+
+        <div class="d-flex justify-content-between align-items-center border-bottom py-3">
+
+            <div>
+
+                <div class="fw-bold">
+
+                    {{ $m->fullname ?? $m->username }}
+
+                </div>
+
+                <small class="text-muted">
+
+                    {{ '@'.$m->username }}
+
+                </small>
+
+            </div>
+
+            @if($m->is_open)
+
+                <span class="badge rounded-pill bg-success px-3 py-2">
+
+                    OPEN
+
+                </span>
+
+            @else
+
+                <span class="badge rounded-pill bg-secondary px-3 py-2">
+
+                    CLOSED
+
+                </span>
+
+            @endif
+
+        </div>
+
+    @empty
+
+        <div class="text-center py-4 text-muted">
+
+            No millers available.
+
+        </div>
+
+    @endforelse
+
+</div>
+
+
+<div class="section-card">
+
+    <div class="section-head">
+
+        <div>
+
+            <h4>
+
+                🌾 Latest Farmer Posts
+
+            </h4>
+
+            <div class="section-note">
+
+                Rice and palay listings
+
+            </div>
+
+        </div>
+
+        <a href="{{ route('resident.marketplace') }}"
+           class="btn btn-outline-success btn-sm">
+
+            Browse
+
+        </a>
+
+    </div>
+
+    @forelse(($products ?? []) as $p)
+
+        <div class="card mb-3 border-0 shadow-sm">
+
+            <div class="card-body">
+
+                <div class="d-flex align-items-center">
+
+                    <div class="flex-grow-1">
+
+                        <h6 class="fw-bold mb-1">
+
+                            {{ $p->name }}
+
+                        </h6>
+
+                        <small class="text-muted d-block">
+
+                            By {{ $p->user->fullname ?? $p->user->username ?? 'Unknown Farmer' }}
+
+                        </small>
+
+                        <small class="text-muted d-block">
+
+                            Stock:
+
+                            {{ number_format($p->kilos_available ?? 0) }} kg
+
+                        </small>
+
+                    </div>
+
+                    <div class="text-end">
+
+                        <div class="fw-bold text-success fs-5">
+
+                            ₱{{ number_format($p->price_per_kg ?? 0,2) }}
+
+                        </div>
+
+                        <small class="text-muted">
+
+                            per kg
+
+                        </small>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    @empty
+
+        <div class="text-center py-5 text-muted">
+
+            <i class="bi bi-box display-5"></i>
+
+            <p class="mt-3">
+
+                No marketplace posts yet.
+
+            </p>
+
+        </div>
+
+    @endforelse
+
+</div>
+
+</div>
+
+</div>
+{{-- Leaflet JS --}}
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
-  const map = L.map('map').setView([18.2760, 121.6440], 13);
 
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap contributors'
-  }).addTo(map);
+document.addEventListener("DOMContentLoaded", function () {
 
-  const greenIcon = new L.Icon({
-    iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png",
-    shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png",
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    shadowSize: [41, 41]
-  });
+    const map = L.map('map').setView([18.3625, 121.6400], 13);
 
-  const blueIcon = new L.Icon({
-    iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png",
-    shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png",
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    shadowSize: [41, 41]
-  });
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 
-  fetch("{{ route('resident.map.data') }}")
-    .then(r => r.json())
-    .then(users => {
-      if (!Array.isArray(users)) return;
+        maxZoom: 19,
 
-      let hasMarkers = false;
-      const bounds = [];
+        attribution: '&copy; OpenStreetMap'
 
-      users.forEach(u => {
-        const lat = parseFloat(u.latitude);
-        const lng = parseFloat(u.longitude);
+    }).addTo(map);
 
-        if (isNaN(lat) || isNaN(lng)) return;
+    const bounds = [];
 
-        hasMarkers = true;
-        bounds.push([lat, lng]);
+    /* ==========================
+       FARMERS
+    ========================== */
 
-        const icon = (u.role === 'farmer') ? greenIcon : blueIcon;
+    @if(isset($farmers))
 
-        const statusLine = (u.role === 'miller')
-          ? `<br>Status: <b>${u.is_open ? 'OPEN' : 'CLOSED'}</b>`
-          : '';
+    @foreach($farmers as $farmer)
 
-        const popup = `
-          <div style="min-width:190px">
-            <b>${u.fullname ?? u.username ?? 'User'}</b><br>
-            Role: ${u.role}
-            ${statusLine}
-            <br><small>Lat: ${lat.toFixed(5)}, Lng: ${lng.toFixed(5)}</small>
-          </div>
-        `;
+        @if($farmer->latitude && $farmer->longitude)
 
-        L.marker([lat, lng], { icon }).addTo(map).bindPopup(popup);
-      });
+        var farmerMarker = L.marker([
+            {{ $farmer->latitude }},
+            {{ $farmer->longitude }}
+        ]).addTo(map);
 
-      if (hasMarkers) {
-        map.fitBounds(bounds, { padding: [30, 30] });
-      }
-    })
-    .catch(error => {
-      console.error('Map data fetch failed:', error);
-    });
+        farmerMarker.bindPopup(`
+            <div style="min-width:200px">
+                <h6 style="margin-bottom:8px;color:#198754;">
+                    🌾 Farmer
+                </h6>
+
+                <strong>{{ $farmer->fullname ?? $farmer->username }}</strong><br>
+
+                {{ $farmer->barangay ?? '' }}
+            </div>
+        `);
+
+        bounds.push([
+            {{ $farmer->latitude }},
+            {{ $farmer->longitude }}
+        ]);
+
+        @endif
+
+    @endforeach
+
+    @endif
+
+    /* ==========================
+       MILLERS
+    ========================== */
+
+    @if(isset($millers))
+
+    @foreach($millers as $miller)
+
+        @if($miller->latitude && $miller->longitude)
+
+        var millerMarker = L.marker([
+            {{ $miller->latitude }},
+            {{ $miller->longitude }}
+        ]).addTo(map);
+
+        millerMarker.bindPopup(`
+            <div style="min-width:200px">
+
+                <h6 style="margin-bottom:8px;color:#0d6efd;">
+                    ⚙️ Miller
+                </h6>
+
+                <strong>{{ $miller->fullname ?? $miller->username }}</strong><br>
+
+                Status:
+                {!! $miller->is_open
+                    ? '<span style="color:green;font-weight:bold;">OPEN</span>'
+                    : '<span style="color:red;font-weight:bold;">CLOSED</span>' !!}
+            </div>
+        `);
+
+        bounds.push([
+            {{ $miller->latitude }},
+            {{ $miller->longitude }}
+        ]);
+
+        @endif
+
+    @endforeach
+
+    @endif
+
+    if(bounds.length){
+
+        map.fitBounds(bounds,{padding:[40,40]});
+
+    }
+
+});
+
 </script>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
+
 </html>

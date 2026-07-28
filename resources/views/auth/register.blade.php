@@ -67,8 +67,12 @@
             </div>
 
             <div class="mb-3">
-              <label class="form-label">Email (optional)</label>
-              <input type="email" name="email" class="form-control" value="{{ old('email') }}">
+              <label class="form-label">Email (Required)</label>
+              <input type="email"
+              name="email"
+              class="form-control"
+              value="{{ old('email') }}"
+              required> 
             </div>
 
             <div class="mb-3">
@@ -116,6 +120,84 @@
               <small class="text-muted">All accounts require admin approval before login.</small>
             </div>
 
+            <div id="farmerFields" style="display:none;">
+
+    <div class="mb-3">
+        <label class="form-label">RSBSA No.</label>
+        <input type="text"
+               name="rsbsa_no"
+               class="form-control"
+               value="{{ old('rsbsa_no') }}"
+               maxlength="50">
+    </div>
+
+    <div class="mb-3">
+
+        <label class="form-label fw-bold">
+            Part of Indigenous Cultural Community (ICC) / Indigenous People (IPs)
+        </label>
+
+        <div class="d-flex gap-4 mt-2">
+
+            <div class="form-check">
+                <input class="form-check-input"
+                       type="radio"
+                       name="is_icc_ip"
+                       id="icc_yes"
+                       value="1"
+                       {{ old('is_icc_ip') == '1' ? 'checked' : '' }}>
+
+                <label class="form-check-label">Yes</label>
+            </div>
+
+            <div class="form-check">
+                <input class="form-check-input"
+                       type="radio"
+                       name="is_icc_ip"
+                       id="icc_no"
+                       value="0"
+                       {{ old('is_icc_ip','0') == '0' ? 'checked' : '' }}>
+
+                <label class="form-check-label">No</label>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div id="iccNameContainer" style="display:none;">
+
+        <label class="form-label">
+            Name of ICC/IP
+        </label>
+
+        <input
+            type="text"
+            class="form-control"
+            name="icc_ip_name"
+            id="icc_ip_name"
+            value="{{ old('icc_ip_name') }}">
+
+    </div>
+
+    <div class="mb-3">
+
+        <label class="form-label fw-bold">
+            Membership in Farmers / Irrigators Association / Cooperative / Organization
+        </label>
+
+        <input
+            type="text"
+            class="form-control"
+            name="membership"
+            value="{{ old('membership') }}">
+
+    </div>
+
+</div>
+
+
+
             <div class="row g-2">
               <div class="col-md-6 mb-3">
                 <label class="form-label">Password</label>
@@ -138,47 +220,64 @@
               <a href="{{ route('main') }}" class="small">Back to Home</a>
             </div>
           </form>
-
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script>
-  const savedLat = {{ old('latitude') !== null ? (float) old('latitude') : 'null' }};
-  const savedLng = {{ old('longitude') !== null ? (float) old('longitude') : 'null' }};
-  const mapCenter = savedLat !== null && savedLng !== null ? [savedLat, savedLng] : [18.2760, 121.6440];
-  const registrationMap = L.map('registrationMap').setView(mapCenter, savedLat !== null && savedLng !== null ? 14 : 12);
-
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap contributors'
-  }).addTo(registrationMap);
-
-  let registrationMarker = null;
-
-  if (savedLat !== null && savedLng !== null) {
-    registrationMarker = L.marker([savedLat, savedLng]).addTo(registrationMap)
-      .bindPopup('Selected location').openPopup();
-  }
-
-  registrationMap.on('click', function(e) {
-    const lat = e.latlng.lat.toFixed(8);
-    const lng = e.latlng.lng.toFixed(8);
-
-    if (registrationMarker) {
-      registrationMap.removeLayer(registrationMarker);
-    }
-
-    registrationMarker = L.marker([lat, lng]).addTo(registrationMap)
-      .bindPopup('Location selected').openPopup();
-
-    document.getElementById('registration_lat').value = lat;
-    document.getElementById('registration_lng').value = lng;
-    document.getElementById('registration_lat_display').value = lat;
-    document.getElementById('registration_lng_display').value = lng;
-  });
-</script>
         </div>
       </div>
     </div>
   </div>
 </div>
+      <script>
 
+document.addEventListener("DOMContentLoaded", function(){
+
+    const role = document.querySelector("select[name='role']");
+
+    const farmerFields = document.getElementById("farmerFields");
+
+    const yes = document.getElementById("icc_yes");
+    const no = document.getElementById("icc_no");
+
+    const iccContainer = document.getElementById("iccNameContainer");
+
+    function toggleFarmer(){
+
+        if(role.value === "farmer"){
+
+            farmerFields.style.display="block";
+
+        }else{
+
+            farmerFields.style.display="none";
+
+        }
+
+    }
+
+    function toggleICC(){
+
+        if(yes.checked){
+
+            iccContainer.style.display="block";
+
+        }else{
+
+            iccContainer.style.display="none";
+
+        }
+
+    }
+
+    role.addEventListener("change",toggleFarmer);
+
+    yes.addEventListener("change",toggleICC);
+
+    no.addEventListener("change",toggleICC);
+
+    toggleFarmer();
+
+    toggleICC();
+
+});
+
+</script>
 </body>
 </html>

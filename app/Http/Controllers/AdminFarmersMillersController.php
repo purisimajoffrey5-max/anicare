@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\FarmProfile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -58,12 +59,15 @@ class AdminFarmersMillersController extends Controller
     }
 
     public function show(int $id)
-    {
-        $this->requireAdmin();
+{
+    $this->requireAdmin();
 
-        $user = User::whereIn('role', ['farmer','miller'])->findOrFail($id);
-        return view('admin.farmers_millers_show', compact('user'));
-    }
+    $user = User::whereIn('role', ['farmer','miller'])->findOrFail($id);
+
+    $profile = FarmProfile::where('user_id', $user->id)->first();
+
+    return view('admin.farmers_millers_show', compact('user', 'profile'));
+}
 
     public function destroy(int $id)
     {

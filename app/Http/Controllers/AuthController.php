@@ -27,6 +27,18 @@ class AuthController extends Controller
             'email' => ['nullable', 'email', 'max:255', 'unique:users,email'],
             'barangay' => ['required', 'string', 'max:100'],
             'role' => ['required', 'in:resident,farmer,miller'],
+
+            // RSBSA Information
+            'rsbsa_no' => ['nullable', 'string', 'max:100'],
+            'is_icc_ip' => ['nullable', 'boolean'],
+            'icc_ip_name' => [
+                'nullable',
+                'required_if:is_icc_ip,1',
+                'string',
+                'max:150'
+            ],
+            'membership' => ['nullable', 'string', 'max:150'],
+
             'password' => [
                 'required',
                 'confirmed',
@@ -35,6 +47,7 @@ class AuthController extends Controller
                 'regex:/[A-Z]/',
                 'regex:/[0-9]/'
             ],
+
             'latitude' => ['nullable', 'numeric', 'between:-90,90'],
             'longitude' => ['nullable', 'numeric', 'between:-180,180'],
         ]);
@@ -44,19 +57,30 @@ class AuthController extends Controller
             'username' => $data['username'],
             'email' => $data['email'] ?? null,
             'barangay' => $data['barangay'],
+
+            // RSBSA Information
+            'rsbsa_no' => $data['rsbsa_no'] ?? null,
+            'is_icc_ip' => (bool) $request->input('is_icc_ip', 0),
+            'icc_ip_name' => $data['icc_ip_name'] ?? null,
+            'membership' => $data['membership'] ?? null,
+
             'role' => $data['role'],
             'password' => Hash::make($data['password']),
+
             'latitude' => $data['latitude'] ?? null,
             'longitude' => $data['longitude'] ?? null,
-            'is_approved' => 0,
-            'approved_at' =>  null,
+
+            'is_approved' => false,
+            'approved_at' => null,
         ]);
 
         if (in_array($data['role'], ['farmer', 'miller', 'resident'])) {
-            return redirect()->route('login')->with('success', 'Account created successfully. Please wait for admin approval before logging in.');
+            return redirect()->route('login')
+                ->with('success', 'Account created successfully. Please wait for admin approval before logging in.');
         }
 
-        return redirect()->route('login')->with('success', 'Account created successfully. You may now log in.');
+        return redirect()->route('login')
+            ->with('success', 'Account created successfully. You may now log in.');
     }
 
     public function login(Request $request)
@@ -70,17 +94,22 @@ class AuthController extends Controller
 
         if (!$user || !Hash::check($request->password, $user->password)) {
             return back()
-                ->withErrors(['login' => 'Invalid username or password.'])
+                ->withErrors([
+                    'login' => 'Invalid username or password.'
+                ])
                 ->withInput($request->only('username'));
         }
 
-        if ((int) $user->is_approved !== 1) {
+        if (!$user->is_approved) {
             return back()
-                ->withErrors(['login' => 'Your account is still pending admin approval.'])
+                ->withErrors([
+                    'login' => 'Your account is still pending admin approval.'
+                ])
                 ->withInput($request->only('username'));
         }
 
         Auth::login($user);
+
         $request->session()->regenerate();
 
         return redirect()->route('dashboard.redirect');
