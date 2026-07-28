@@ -84,36 +84,39 @@ class AuthController extends Controller
     }
 
     public function login(Request $request)
-    {
-        $request->validate([
-            'username' => ['required', 'string'],
-            'password' => ['required', 'string'],
-        ]);
+{
+    $request->validate([
+        'username' => ['required', 'string'],
+        'password' => ['required', 'string'],
+    ]);
 
-        $user = User::where('username', $request->username)->first();
+    $user = User::where('username', $request->username)->first();
 
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            return back()
-                ->withErrors([
-                    'login' => 'Invalid username or password.'
-                ])
-                ->withInput($request->only('username'));
-        }
-
-        if (!$user->is_approved) {
-            return back()
-                ->withErrors([
-                    'login' => 'Your account is still pending admin approval.'
-                ])
-                ->withInput($request->only('username'));
-        }
-
-        Auth::login($user);
-
-        $request->session()->regenerate();
-
-        return redirect()->route('dashboard.redirect');
+    if (!$user || !Hash::check($request->password, $user->password)) {
+        return back()
+            ->withErrors([
+                'login' => 'Invalid username or password.'
+            ])
+            ->withInput($request->only('username'));
     }
+
+    if (!$user->is_approved) {
+        return back()
+            ->withErrors([
+                'login' => 'Your account is still pending admin approval.'
+            ])
+            ->withInput($request->only('username'));
+    }
+
+    Auth::login($user);
+
+    $request->session()->regenerate();
+
+    // Loader will appear only after successful login
+    $request->session()->put('show_login_loader', true);;
+
+    return redirect()->route('dashboard.redirect');
+} 
 
     public function redirectDashboard()
     {

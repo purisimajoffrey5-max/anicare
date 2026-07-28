@@ -387,6 +387,9 @@ font-size:15px;
 </head>
 
 <body>
+  @if(session()->pull('show_login_loader'))
+    @include('components.loader')
+@endif
 
 @php
 

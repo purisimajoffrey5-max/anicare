@@ -97,6 +97,9 @@
   </style>
 </head>
 <body>
+  @if(session()->pull('show_login_loader'))
+    @include('components.loader')
+@endif
 
 {{-- TOP BAR --}}
 <div class="topbar">

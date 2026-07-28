@@ -228,6 +228,9 @@ RESPONSIVE
 
 <body>
 
+  @if(session()->pull('show_login_loader'))
+    @include('components.loader')
+@endif
 <!-- TOPBAR -->
 
 <div class="topbar">

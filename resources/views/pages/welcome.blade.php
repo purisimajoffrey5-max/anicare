@@ -17,10 +17,29 @@
     .card, .card-body { word-wrap: break-word; }
     .btn, .form-control, .form-select, .input-group, .form-check-input { min-width: 0; }
     @media (max-width: 768px) {
-      .navbar, .topbar { flex-wrap: wrap !important; }
-      .navbar-brand, .navbar-nav, .btn { width: 100% !important; text-align: center !important; }
-      .table-responsive { margin-left: -1rem !important; margin-right: -1rem !important; padding-left: 1rem !important; padding-right: 1rem !important; }
+
+    .navbar,
+    .topbar {
+        flex-wrap: wrap !important;
     }
+
+    .navbar-brand {
+        width: auto !important;
+        text-align: left !important;
+    }
+
+    .navbar-nav {
+        width: 100% !important;
+    }
+
+    .table-responsive {
+        margin-left: -1rem !important;
+        margin-right: -1rem !important;
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+
+}
   </style>
 
     <!-- Bootstrap -->
@@ -85,6 +104,7 @@
     </style>
 </head>
 <body>
+    @include('components.landing-splash')
 
 <!-- NAVBAR -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-success fixed-top">
@@ -308,7 +328,7 @@
         <h5 class="fw-bold mb-1">ANI-CARE ALLACAPAN</h5>
         <p class="mb-1">LGU Rice Assistance & Marketplace System</p>
         <div class="small mb-2">
-            📍 Allacapan, Cagayan • ☎️ (Add contact number) • ✉️ (Add email)
+            📍 Allacapan, Cagayan • ☎️ (Add contact number) • ✉️ (anicare.system@gmail.com)
         </div>
         <small>© {{ date('Y') }} All Rights Reserved | Allacapan, Cagayan</small>
     </div>
