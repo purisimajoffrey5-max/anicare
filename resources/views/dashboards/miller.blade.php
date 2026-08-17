@@ -23,6 +23,7 @@
     }
   </style>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
   <style>
     *{
@@ -231,7 +232,7 @@
 
     .cards-grid{
       display:grid;
-      grid-template-columns:repeat(3, 1fr);
+      grid-template-columns:repeat(4, 1fr);
       gap:14px;
       margin-bottom:14px;
     }
@@ -404,6 +405,9 @@
     <div class="brand">ANI-CARE | Miller</div>
 
     <div class="header-actions">
+      {{-- GLOBAL TRANSACTION NOTIFICATION BELL --}}
+      @include('components.notification-bell')
+
       <a href="{{ route('miller.profile') }}" class="header-chip">My Profile</a>
       <form method="POST" action="{{ route('miller.toggleOpen') }}" class="m-0">
         @csrf
@@ -489,6 +493,16 @@
         <h4>Milling Reports</h4>
         <p>Review completed milling records and monitor finished transactions.</p>
         <span class="card-btn-outline">View Reports</span>
+      </div>
+    </a>
+
+
+    <a class="card-link" href="{{ route('miller.earnings.index') }}">
+      <div class="dash-card">
+        <div class="card-icon">💰</div>
+        <h4>Earnings & Analytics</h4>
+        <p>Track paid milling revenue, receivables, processed kilos, and monthly performance.</p>
+        <span class="card-btn">View Analytics</span>
       </div>
     </a>
   </section>

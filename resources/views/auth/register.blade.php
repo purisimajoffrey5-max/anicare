@@ -76,6 +76,25 @@
             </div>
 
             <div class="mb-3">
+    <label class="form-label">Mobile Number</label>
+
+    <input
+        type="text"
+        name="mobile_number"
+        class="form-control"
+        value="{{ old('mobile_number') }}"
+        placeholder="09XXXXXXXXX"
+        maxlength="11"
+        pattern="09[0-9]{9}"
+        required
+    >
+
+    <div class="form-text">
+        Example: 09123456789
+    </div>
+</div>
+
+            <div class="mb-3">
               <label class="form-label">Barangay</label>
               <select name="barangay" class="form-select" required>
                 <option value="" disabled {{ old('barangay') ? '' : 'selected' }}>-- Select Barangay --</option>

@@ -4,40 +4,36 @@
   <meta charset="UTF-8">
   <title>Marketplace | Admin</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- Mobile responsive helpers -->
-  <style>
-    html { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-    *, *::before, *::after { box-sizing: inherit; }
-    body { min-height: 100vh; margin: 0; }
-    img, video, iframe, svg, canvas { max-width: 100%; height: auto; }
-    .container, .container-fluid { width: 100% !important; max-width: 100% !important; padding-left: 1rem !important; padding-right: 1rem !important; }
-    .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-    .table-responsive table { min-width: 100%; }
-    .leaflet-container, #registrationMap, #residentMap, #orderMap, #trackMap { width: 100% !important; max-width: 100%; }
-    .card, .card-body { word-wrap: break-word; }
-    .btn, .form-control, .form-select, .input-group, .form-check-input { min-width: 0; }
-    @media (max-width: 768px) {
-      .navbar, .topbar { flex-wrap: wrap !important; }
-      .navbar-brand, .navbar-nav, .btn { width: 100% !important; text-align: center !important; }
-      .table-responsive { margin-left: -1rem !important; margin-right: -1rem !important; padding-left: 1rem !important; padding-right: 1rem !important; }
-    }
-  </style>
+
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 
   <style>
+    *{
+      box-sizing:border-box;
+    }
+
+    html,body{
+      margin:0;
+      min-height:100%;
+      font-family:"Segoe UI",Tahoma,Geneva,Verdana,sans-serif;
+    }
+
     body{
       background:#f5f7fb;
-      font-family:"Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      color:#1f2937;
+      overflow-x:hidden;
     }
 
     .topbar{
       background:#198754;
+      box-shadow:0 2px 8px rgba(0,0,0,.08);
     }
 
     .wrap{
       max-width:1100px;
       margin:0 auto;
-      padding:16px 14px 70px;
+      padding:18px 14px 70px;
     }
 
     .soft{
@@ -50,9 +46,118 @@
     .pill{
       border-radius:999px;
       padding:6px 10px;
-      font-size:12px;
-      font-weight:700;
+      font-size:11px;
+      font-weight:800;
+      flex-shrink:0;
     }
+
+    .section-title{
+      font-weight:800;
+      margin:0;
+    }
+
+    .small-note{
+      color:#6b7280;
+      font-size:13px;
+    }
+
+    /* =========================
+       MILLERS
+    ========================== */
+
+    .millers-card{
+      overflow:hidden;
+    }
+
+    .millers-header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:12px;
+    }
+
+    .millers-title-wrap{
+      min-width:0;
+    }
+
+    .millers-title{
+      font-size:17px;
+      font-weight:800;
+      margin:0;
+    }
+
+    .millers-subtitle{
+      color:#6b7280;
+      font-size:12px;
+      margin-top:2px;
+    }
+
+    .miller-item{
+      border:1px solid #e5e7eb;
+      border-radius:12px;
+      padding:10px 11px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      background:#fff;
+      height:100%;
+      transition:.18s ease;
+    }
+
+    .miller-item:hover{
+      border-color:#b7d7c5;
+      box-shadow:0 4px 12px rgba(25,135,84,.08);
+    }
+
+    .miller-info{
+      min-width:0;
+    }
+
+    .miller-name{
+      font-weight:700;
+      font-size:13px;
+      color:#111827;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .miller-username{
+      color:#6b7280;
+      font-size:11px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .miller-extra{
+      display:none;
+    }
+
+    .miller-extra.show{
+      display:block;
+    }
+
+    .view-all-wrap{
+      display:flex;
+      justify-content:center;
+      margin-top:14px;
+      padding-top:12px;
+      border-top:1px solid #eef0f2;
+    }
+
+    .view-all-btn{
+      min-width:190px;
+      border-radius:12px;
+      font-weight:700;
+      padding:9px 16px;
+    }
+
+    /* =========================
+       PRODUCTS
+    ========================== */
 
     .product-img{
       width:100%;
@@ -137,168 +242,528 @@
       color:#6b7280;
     }
 
-    .section-title{
-      font-weight:800;
-      margin:0;
-    }
-
-    .small-note{
-      color:#6b7280;
-      font-size:13px;
-    }
+    /* =========================
+       RESPONSIVE
+    ========================== */
 
     @media (max-width: 768px){
       .wrap{
         padding:14px 10px 50px;
       }
+
+      .navbar .container-fluid{
+        gap:10px;
+      }
+
+      .navbar-brand{
+        width:100%;
+        text-align:center;
+      }
+
+      .navbar .d-flex{
+        width:100%;
+        display:grid !important;
+        grid-template-columns:repeat(2,minmax(0,1fr));
+      }
+
+      .navbar .d-flex .btn,
+      .navbar .d-flex form,
+      .navbar .d-flex form button{
+        width:100%;
+      }
+
+      .millers-header{
+        align-items:flex-start;
+      }
+
+      .miller-name{
+        font-size:12px;
+      }
+
+      .miller-username{
+        font-size:10px;
+      }
+
+      .pill{
+        font-size:9px;
+        padding:5px 8px;
+      }
+
+      .view-all-btn{
+        width:100%;
+      }
+    }
+
+    @media (max-width: 575.98px){
+      .wrap{
+        padding-left:9px;
+        padding-right:9px;
+      }
+
+      .soft{
+        border-radius:14px;
+      }
+
+      .miller-item{
+        padding:9px;
+      }
+
+      .product-img,
+      .no-photo{
+        height:160px;
+      }
     }
   </style>
 </head>
+
 <body>
 
 <nav class="navbar navbar-dark topbar">
   <div class="container-fluid px-3">
-    <span class="navbar-brand fw-bold m-0">ANI-CARE | Admin</span>
+
+    <span class="navbar-brand fw-bold m-0">
+      ANI-CARE | Admin
+    </span>
 
     <div class="d-flex gap-2 flex-wrap">
-      <a href="{{ route('admin.dashboard') }}" class="btn btn-outline-light btn-sm">Dashboard</a>
-      <a href="{{ route('admin.market') }}" class="btn btn-light btn-sm">Marketplace</a>
-      <a href="{{ route('admin.inventory') }}" class="btn btn-outline-light btn-sm">Inventory</a>
+      <a
+        href="{{ route('admin.dashboard') }}"
+        class="btn btn-outline-light btn-sm"
+      >
+        <i class="bi bi-arrow-left me-1"></i>
+        Back
+      </a>
 
-      <form method="POST" action="{{ route('logout') }}">
+      <a
+        href="{{ route('admin.orders.index') }}"
+        class="btn btn-light btn-sm"
+      >
+        <i class="bi bi-bag-check me-1"></i>
+        My Orders
+      </a>
+
+      <form
+        method="POST"
+        action="{{ route('logout') }}"
+      >
         @csrf
-        <button class="btn btn-warning btn-sm">Logout</button>
+
+        <button class="btn btn-warning btn-sm">
+          <i class="bi bi-box-arrow-right me-1"></i>
+          Logout
+        </button>
       </form>
     </div>
+
   </div>
 </nav>
+
 
 <div class="wrap">
 
   @if(session('success'))
-    <div class="alert alert-success">{{ session('success') }}</div>
+    <div class="alert alert-success">
+      {{ session('success') }}
+    </div>
   @endif
 
   @if($errors->any())
-    <div class="alert alert-danger">{{ $errors->first() }}</div>
+    <div class="alert alert-danger">
+      {{ $errors->first() }}
+    </div>
   @endif
 
-  <h3 class="fw-bold mb-0">Marketplace Overview</h3>
-  <div class="text-muted mb-3">Monitor all rice/palay posts and miller availability.</div>
 
-  {{-- Search + Open Millers --}}
+  <h3 class="fw-bold mb-0">
+    Marketplace Overview
+  </h3>
+
+  <div class="text-muted mb-3">
+    Monitor all rice/palay posts and miller availability.
+  </div>
+
+
+  {{-- =========================================================
+       SEARCH + OPEN MILLERS
+  ========================================================= --}}
   <div class="row g-3 mb-3">
+
     <div class="col-md-7">
       <div class="soft p-3">
-        <form method="GET" action="{{ route('admin.market') }}" class="row g-2">
+
+        <form
+          method="GET"
+          action="{{ route('admin.market') }}"
+          class="row g-2"
+        >
           <div class="col-8">
             <input
               class="form-control"
               name="q"
               value="{{ $q ?? '' }}"
-              placeholder="Search variety / farmer (e.g., IR64, Juan)">
+              placeholder="Search variety / farmer (e.g., IR64, Juan)"
+            >
           </div>
+
           <div class="col-4 d-grid">
-            <button class="btn btn-success">Search</button>
+            <button class="btn btn-success">
+              Search
+            </button>
           </div>
         </form>
+
       </div>
     </div>
+
 
     <div class="col-md-5">
-      <div class="soft p-3" style="background:#e8f3ff;">
-        <div class="text-muted">Open Millers</div>
-        <div class="fs-2 fw-bold">{{ $openMillersCount ?? 0 }}</div>
-        <div class="text-muted small">Live status today</div>
+      <div
+        class="soft p-3"
+        style="background:#e8f3ff;"
+      >
+        <div class="text-muted">
+          Open Millers
+        </div>
+
+        <div class="fs-2 fw-bold">
+          {{ $openMillersCount ?? 0 }}
+        </div>
+
+        <div class="text-muted small">
+          Live status today
+        </div>
       </div>
     </div>
+
   </div>
 
-  {{-- Millers --}}
-  <div class="soft p-3 mb-4">
-    <div class="d-flex justify-content-between align-items-center mb-2">
-      <div class="fw-bold">Millers</div>
-      <div class="text-muted small">OPEN / CLOSED</div>
+
+  {{-- =========================================================
+       MILLERS
+       First 6 only, then VIEW ALL button
+  ========================================================= --}}
+
+  @php
+    $millerList = collect($millers ?? []);
+    $millerCount = $millerList->count();
+    $previewLimit = 6;
+  @endphp
+
+  <div class="soft p-3 mb-4 millers-card">
+
+    <div class="millers-header">
+
+      <div class="millers-title-wrap">
+        <h5 class="millers-title">
+          Millers
+        </h5>
+
+        <div class="millers-subtitle">
+          Showing
+          {{ min($previewLimit, $millerCount) }}
+          of
+          {{ $millerCount }}
+          miller{{ $millerCount === 1 ? '' : 's' }}
+        </div>
+      </div>
+
+      <div class="text-muted small">
+        OPEN / CLOSED
+      </div>
+
     </div>
 
-    <div class="row g-2">
-      @forelse(($millers ?? []) as $m)
-        <div class="col-md-4">
-          <div class="border rounded-3 p-2 d-flex justify-content-between align-items-center">
-            <div>
-              <div class="fw-semibold">{{ $m->fullname ?? $m->username }}</div>
-              <div class="text-muted small">{{ '@'.$m->username }}</div>
+
+    <div class="row g-2" id="millerGrid">
+
+      @forelse($millerList as $m)
+
+        @php
+          $isExtra = $loop->index >= $previewLimit;
+        @endphp
+
+        <div
+          class="col-12 col-md-6 col-lg-4 {{ $isExtra ? 'miller-extra' : '' }}"
+          data-miller-extra="{{ $isExtra ? '1' : '0' }}"
+        >
+
+          <div class="miller-item">
+
+            <div class="miller-info">
+
+              <div
+                class="miller-name"
+                title="{{ $m->fullname ?? $m->username }}"
+              >
+                {{ $m->fullname ?? $m->username }}
+              </div>
+
+              <div class="miller-username">
+                {{ '@'.$m->username }}
+              </div>
+
             </div>
 
+
             @if($m->is_open)
-              <span class="pill bg-success text-white">OPEN</span>
+
+              <span class="pill bg-success text-white">
+                OPEN
+              </span>
+
             @else
-              <span class="pill bg-secondary text-white">CLOSED</span>
+
+              <span class="pill bg-secondary text-white">
+                CLOSED
+              </span>
+
             @endif
+
+          </div>
+
+        </div>
+
+      @empty
+
+        <div class="col-12">
+          <div class="text-muted text-center py-4">
+            No millers found.
           </div>
         </div>
-      @empty
-        <div class="text-muted">No millers found.</div>
+
       @endforelse
+
     </div>
+
+
+    @if($millerCount > $previewLimit)
+
+      <div class="view-all-wrap">
+
+        <button
+          type="button"
+          class="btn btn-outline-success view-all-btn"
+          id="toggleMillersBtn"
+          aria-expanded="false"
+        >
+          <i class="bi bi-people-fill me-1"></i>
+          <span id="toggleMillersText">
+            View All Millers
+          </span>
+        </button>
+
+      </div>
+
+    @endif
+
   </div>
 
-  {{-- Products --}}
+
+  {{-- =========================================================
+       PRODUCTS
+  ========================================================= --}}
+
   <div class="d-flex justify-content-between align-items-center mb-3">
-    <h4 class="section-title">Rice / Palay Posts</h4>
-    <span class="small-note">Latest posts</span>
+
+    <h4 class="section-title">
+      Rice / Palay Posts
+    </h4>
+
+    <span class="small-note">
+      Latest posts
+    </span>
+
   </div>
+
 
   <div class="row g-3">
+
     @forelse(($products ?? []) as $p)
+
       @php
-        $img = !empty($p->photo_path) ? asset('storage/'.$p->photo_path) : null;
-        $stock = (float) ($p->kilos_available ?? 0);
-        $price = (float) ($p->price_per_kg ?? 0);
+        $img =
+          !empty($p->photo_path)
+            ? asset('storage/'.$p->photo_path)
+            : null;
+
+        $stock =
+          (float) ($p->kilos_available ?? 0);
+
+        $price =
+          (float) ($p->price_per_kg ?? 0);
       @endphp
 
-      <div class="col-md-4">
+
+      <div class="col-12 col-sm-6 col-lg-4">
+
         <div class="product-card">
 
+
           @if($img)
-            <img src="{{ $img }}" class="product-img mb-3" alt="product">
+
+            <img
+              src="{{ $img }}"
+              class="product-img mb-3"
+              alt="{{ $p->name }}"
+            >
+
           @else
-            <div class="no-photo mb-3">No photo</div>
+
+            <div class="no-photo mb-3">
+              No photo
+            </div>
+
           @endif
 
-          <div class="product-title">{{ $p->name }}</div>
+
+          <div class="product-title">
+            {{ $p->name }}
+          </div>
+
 
           <div class="product-meta">
+
             Type:
-            <span class="badge bg-secondary text-uppercase">{{ $p->type ?? '-' }}</span>
+
+            <span class="badge bg-secondary text-uppercase">
+              {{ $p->type ?? '-' }}
+            </span>
+
           </div>
+
 
           <div class="product-meta">
-            By {{ $p->user->fullname ?? $p->user->username ?? 'Unknown' }}
+            By
+            {{ $p->user->fullname
+                ?? $p->user->username
+                ?? 'Unknown' }}
           </div>
 
-          <div class="product-price">₱{{ number_format($price, 2) }} / kg</div>
-          <div class="stock-note">{{ number_format($stock, 2) }} kg available</div>
 
-          <a href="{{ route('admin.checkout.show', $p->id) }}"
-             class="view-btn {{ $stock <= 0 ? 'disabled' : '' }}">
+          <div class="product-price">
+            ₱{{ number_format($price, 2) }} / kg
+          </div>
+
+
+          <div class="stock-note">
+            {{ number_format($stock, 2) }} kg available
+          </div>
+
+
+          <a
+            href="{{ route('admin.checkout.show', $p->id) }}"
+            class="view-btn {{ $stock <= 0 ? 'disabled' : '' }}"
+          >
+            <i class="bi bi-cart-check me-1"></i>
             Order Now
           </a>
+
         </div>
+
       </div>
+
     @empty
+
       <div class="col-12">
-        <div class="soft p-4 text-center text-muted">No products found.</div>
+
+        <div class="soft p-4 text-center text-muted">
+          No products found.
+        </div>
+
       </div>
+
     @endforelse
+
   </div>
 
-  <div class="pagination-wrap mt-4 d-flex justify-content-center">
-    {{ $products->links() ?? '' }}
-  </div>
+
+  @if(isset($products) && method_exists($products, 'links'))
+
+    <div class="pagination-wrap mt-4 d-flex justify-content-center">
+      {{ $products->links() }}
+    </div>
+
+  @endif
 
 </div>
 
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const toggleButton =
+        document.getElementById('toggleMillersBtn');
+
+    if (!toggleButton) {
+        return;
+    }
+
+    const toggleText =
+        document.getElementById('toggleMillersText');
+
+    const extraMillers =
+        document.querySelectorAll('.miller-extra');
+
+    let expanded = false;
+
+
+    toggleButton.addEventListener('click', function () {
+
+        expanded = !expanded;
+
+        extraMillers.forEach(function (item) {
+
+            if (expanded) {
+                item.classList.add('show');
+            } else {
+                item.classList.remove('show');
+            }
+
+        });
+
+
+        toggleButton.setAttribute(
+            'aria-expanded',
+            expanded ? 'true' : 'false'
+        );
+
+
+        toggleText.textContent =
+            expanded
+                ? 'Show Less Millers'
+                : 'View All Millers';
+
+
+        const icon =
+            toggleButton.querySelector('i');
+
+        if (icon) {
+
+            icon.className =
+                expanded
+                    ? 'bi bi-chevron-up me-1'
+                    : 'bi bi-people-fill me-1';
+        }
+
+
+        /*
+         * When collapsing, scroll gently back to the Millers section.
+         */
+        if (!expanded) {
+
+            document.querySelector('.millers-card')
+                ?.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+        }
+
+    });
+
+});
+</script>
+
 </body>
 </html>

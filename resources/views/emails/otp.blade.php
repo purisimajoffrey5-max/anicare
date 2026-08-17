@@ -87,13 +87,13 @@ Hello,
 
 <p>
 
-Someone requested to reset your password.
+{{ $introLine }}
 
 </p>
 
 <p>
 
-Use the verification code below.
+{{ $instructionLine }}
 
 </p>
 
@@ -117,9 +117,7 @@ The code is valid for
 
 <p>
 
-If you did not request this,
-
-please ignore this email.
+{{ $warningLine }}
 
 </p>
 

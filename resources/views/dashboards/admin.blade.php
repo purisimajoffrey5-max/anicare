@@ -4,203 +4,353 @@
   <meta charset="UTF-8">
   <title>Admin Dashboard | ANI-CARE</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- Mobile responsive helpers -->
-  <style>
-    html { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-    *, *::before, *::after { box-sizing: inherit; }
-    body { min-height: 100vh; margin: 0; }
-    img, video, iframe, svg, canvas { max-width: 100%; height: auto; }
-    .container, .container-fluid { width: 100% !important; max-width: 100% !important; padding-left: 1rem !important; padding-right: 1rem !important; }
-    .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-    .table-responsive table { min-width: 100%; }
-    .leaflet-container, #registrationMap, #residentMap, #orderMap, #trackMap { width: 100% !important; max-width: 100%; }
-    .card, .card-body { word-wrap: break-word; }
-    .btn, .form-control, .form-select, .input-group, .form-check-input { min-width: 0; }
-    @media (max-width: 768px) {
-      .navbar, .topbar { flex-wrap: wrap !important; }
-      .navbar-brand, .navbar-nav, .btn { width: 100% !important; text-align: center !important; }
-      .table-responsive { margin-left: -1rem !important; margin-right: -1rem !important; padding-left: 1rem !important; padding-right: 1rem !important; }
-    }
-  </style>
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
   <style>
-    body { background:#f5f7fb; }
+    * { box-sizing: border-box; }
 
-    /* TOPBAR */
-    .topbar{
-      background:#198754;
-      min-height:56px;
-      display:flex;
-      align-items:center;
-      color:#fff;
-      padding:10px 0;
+    html, body {
+      min-height: 100%;
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
     }
 
-    /* WRAPPER */
-    .page-wrap{
-      max-width:1200px;
-      margin:0 auto;
-      padding:20px 12px 50px;
+    body {
+      background: #f5f7fb;
+      color: #20252b;
     }
 
-    /* CARDS */
-    .dash-card{
-      border:1px solid rgba(0,0,0,.06);
-      border-radius:12px;
-      background:#fff;
-      height:100%;
-      transition:.15s;
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 1030;
+      background: #198754;
+      color: #fff;
+      box-shadow: 0 3px 14px rgba(0,0,0,.12);
     }
 
-    .dash-card:hover{
+    .topbar-inner {
+      width: min(1200px, 100%);
+      min-height: 64px;
+      margin: 0 auto;
+      padding: 10px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand {
+      font-weight: 800;
+      font-size: 18px;
+      white-space: nowrap;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .admin-name {
+      max-width: 190px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .page-wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 22px 12px 60px;
+    }
+
+    .dash-card {
+      border: 1px solid rgba(0,0,0,.06);
+      border-radius: 16px;
+      background: #fff;
+      height: 100%;
+      box-shadow: 0 5px 18px rgba(15,23,42,.045);
+      transition: .18s;
+    }
+
+    .dash-card:hover {
       transform: translateY(-3px);
-      box-shadow: 0 12px 28px rgba(25,135,84,.15);
+      box-shadow: 0 12px 28px rgba(25,135,84,.12);
     }
 
-    .card-link{
-      text-decoration:none;
-      color:inherit;
-      display:block;
+    .card-link {
+      text-decoration: none;
+      color: inherit;
+      display: block;
+      height: 100%;
     }
 
-    /* MOBILE IMPROVEMENTS */
-    @media (max-width: 768px){
+    .module-icon {
+      width: 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      border-radius: 12px;
+      background: #eaf7f0;
+      color: #198754;
+      font-size: 20px;
+      margin-bottom: 12px;
+    }
 
-      .topbar .container-fluid{
-        flex-direction:column;
-        align-items:flex-start !important;
-        gap:6px;
+    /* Special milling cards */
+    .milling-request-card {
+      border-color: rgba(13,110,253,.18);
+      background: linear-gradient(180deg, #ffffff 0%, #f7fbff 100%);
+    }
+
+    .milling-request-card .module-icon {
+      background: #e8f1ff;
+      color: #0d6efd;
+    }
+
+    .milling-track-card {
+      border-color: rgba(111,66,193,.16);
+      background: linear-gradient(180deg, #ffffff 0%, #fbf9ff 100%);
+    }
+
+    .milling-track-card .module-icon {
+      background: #f0eaff;
+      color: #6f42c1;
+    }
+
+    .stat-icon {
+      width: 38px;
+      height: 38px;
+      margin: 0 auto 8px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: #eaf7f0;
+      color: #198754;
+    }
+
+    .recent-mobile {
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      .topbar-inner {
+        min-height: 60px;
+        padding: 9px 10px;
       }
 
-      .page-wrap{
-        padding:18px 10px 40px;
+      .brand {
+        font-size: 16px;
       }
 
-      h3{
-        font-size:20px;
+      .admin-name {
+        display: none;
       }
 
-      .dash-card{
-        padding:14px !important;
+      .top-actions .btn-warning {
+        width: 42px;
+        height: 42px;
+        padding: 0;
+        font-size: 0;
+        display: grid;
+        place-items: center;
+        border-radius: 12px;
       }
 
-      .btn{
-        width:100%;
+      .top-actions .btn-warning i {
+        font-size: 18px;
       }
 
-      table{
-        font-size:13px;
+      .page-wrap {
+        padding: 18px 10px 50px;
+      }
+
+      .desktop-activity {
+        display: none;
+      }
+
+      .recent-mobile {
+        display: block;
+      }
+
+      .activity-card {
+        background: #f8faf9;
+        border: 1px solid #edf0ef;
+        border-radius: 12px;
+        padding: 11px;
+        margin-bottom: 8px;
       }
     }
   </style>
 </head>
 <body>
-  @if(session()->pull('show_login_loader'))
-    @include('components.loader')
+
+@if(session()->pull('show_login_loader'))
+  @include('components.loader')
 @endif
 
-{{-- TOP BAR --}}
-<div class="topbar">
-  <div class="container-fluid d-flex justify-content-between align-items-center px-3 px-md-4">
+<header class="topbar">
+  <div class="topbar-inner">
 
-    <div class="fw-bold">ANI-CARE | Admin</div>
+    <div class="brand">
+      <i class="bi bi-shield-check me-1"></i>
+      ANI-CARE | Admin
+    </div>
 
-    <div class="d-flex gap-2 align-items-center flex-wrap">
-      <span class="text-white small">
+    <div class="top-actions">
+      <span class="admin-name text-white small">
         {{ Auth::user()->fullname ?? 'Admin' }}
       </span>
 
-      <form method="POST" action="{{ route('logout') }}">
+      {{-- GLOBAL TRANSACTION NOTIFICATION BELL --}}
+      @include('components.notification-bell')
+
+      <form method="POST" action="{{ route('logout') }}" class="m-0">
         @csrf
-        <button class="btn btn-warning btn-sm">Logout</button>
+        <button class="btn btn-warning btn-sm" title="Logout">
+          <i class="bi bi-box-arrow-right"></i>
+          <span class="d-none d-md-inline">Logout</span>
+        </button>
       </form>
     </div>
 
   </div>
-</div>
+</header>
 
-{{-- CONTENT --}}
-<div class="page-wrap">
+<main class="page-wrap">
 
-  <h3 class="fw-bold mb-1">Welcome, Admin 👨‍💼</h3>
+  <h3 class="fw-bold mb-1 text-success">
+    Welcome, Admin 👨‍💼
+  </h3>
+
   <div class="text-muted mb-4">
-    Manage ANI-CARE system operations including farmers, inventory, and distributions.
+    Manage ANI-CARE operations and monitor account, marketplace, milling, inventory,
+    distribution, payment, and delivery transactions.
   </div>
 
   {{-- QUICK CARDS --}}
   <div class="row g-3 mb-4">
 
-    <div class="col-12 col-sm-6 col-lg-4">
-      <a href="{{ route('admin.farmers_millers') }}" class="card-link">
-        <div class="dash-card p-3">
-          <h5 class="fw-bold text-success">Farmers & Millers</h5>
-          <div class="text-muted small mb-3">Manage user profiles</div>
-          <span class="btn btn-success btn-sm">Open</span>
-        </div>
-      </a>
-    </div>
+    @php
+      $adminModules = [
+        [
+          'route' => 'admin.farmers_millers',
+          'icon' => 'bi-people-fill',
+          'title' => 'Farmers & Millers',
+          'text' => 'Manage user profiles',
+          'button' => 'Open',
+          'class' => '',
+        ],
+        [
+          'route' => 'admin.inventory',
+          'icon' => 'bi-box-seam-fill',
+          'title' => 'Inventory',
+          'text' => 'Track purchased rice and palay stock',
+          'button' => 'View',
+          'class' => '',
+        ],
 
-    <div class="col-12 col-sm-6 col-lg-4">
-      <a href="{{ route('admin.inventory') }}" class="card-link">
-        <div class="dash-card p-3">
-          <h5 class="fw-bold text-success">Inventory</h5>
-          <div class="text-muted small mb-3">Track rice stock</div>
-          <span class="btn btn-success btn-sm">View</span>
-        </div>
-      </a>
-    </div>
+        /*
+        |--------------------------------------------------------------------------
+        | ADMIN -> MILLER REQUEST
+        |--------------------------------------------------------------------------
+        |
+        | Admin can now submit a milling request just like a Farmer.
+        |
+        */
+        [
+          'route' => 'admin.milling.create',
+          'icon' => 'bi-gear-wide-connected',
+          'title' => 'Request Milling',
+          'text' => 'Send a palay milling request to an available Miller',
+          'button' => 'Request',
+          'class' => 'milling-request-card',
+        ],
 
-    <div class="col-12 col-sm-6 col-lg-4">
-      <a href="{{ route('admin.distribution') }}" class="card-link">
-        <div class="dash-card p-3">
-          <h5 class="fw-bold text-success">Distribution</h5>
-          <div class="text-muted small mb-3">Manage schedules</div>
-          <span class="btn btn-success btn-sm">Manage</span>
-        </div>
-      </a>
-    </div>
+        /*
+        |--------------------------------------------------------------------------
+        | ADMIN MILLING TRANSACTION TRACKER
+        |--------------------------------------------------------------------------
+        */
+        [
+          'route' => 'admin.milling.index',
+          'icon' => 'bi-clipboard2-check-fill',
+          'title' => 'My Milling Requests',
+          'text' => 'Track schedule, payment, milling progress and proof',
+          'button' => 'Track',
+          'class' => 'milling-track-card',
+        ],
 
-    <div class="col-12 col-sm-6 col-lg-4">
-      <a href="{{ route('admin.approvals') }}" class="card-link">
-        <div class="dash-card p-3">
-          <h5 class="fw-bold text-success">User Approvals</h5>
-          <div class="text-muted small mb-3">Approve accounts</div>
-          <span class="btn btn-success btn-sm">Review</span>
-        </div>
-      </a>
-    </div>
+        [
+          'route' => 'admin.distribution',
+          'icon' => 'bi-box2-heart-fill',
+          'title' => 'Distribution',
+          'text' => 'Manage schedules',
+          'button' => 'Manage',
+          'class' => '',
+        ],
+        [
+          'route' => 'admin.approvals',
+          'icon' => 'bi-person-check-fill',
+          'title' => 'User Approvals',
+          'text' => 'Approve registered accounts',
+          'button' => 'Review',
+          'class' => '',
+        ],
+        [
+          'route' => 'admin.market',
+          'icon' => 'bi-shop',
+          'title' => 'Marketplace',
+          'text' => 'Buy and monitor farmer marketplace products',
+          'button' => 'Open',
+          'class' => '',
+        ],
+        [
+          'route' => 'admin.announcements.index',
+          'icon' => 'bi-megaphone-fill',
+          'title' => 'Announcements',
+          'text' => 'Post system updates',
+          'button' => 'Manage',
+          'class' => '',
+        ],
+        [
+          'route' => 'notifications.index',
+          'icon' => 'bi-bell-fill',
+          'title' => 'Notifications',
+          'text' => 'View all transaction alerts',
+          'button' => 'Open',
+          'class' => '',
+        ],
+      ];
+    @endphp
 
-    <div class="col-12 col-sm-6 col-lg-4">
-      <a href="{{ route('admin.market') }}" class="card-link">
-        <div class="dash-card p-3">
-          <h5 class="fw-bold text-success">Marketplace</h5>
-          <div class="text-muted small mb-3">View products</div>
-          <span class="btn btn-success btn-sm">Open</span>
-        </div>
-      </a>
-    </div>
+    @foreach($adminModules as $module)
+      <div class="col-12 col-sm-6 col-lg-4">
+        <a href="{{ route($module['route']) }}" class="card-link">
+          <div class="dash-card p-3 {{ $module['class'] }}">
+            <div class="module-icon">
+              <i class="bi {{ $module['icon'] }}"></i>
+            </div>
 
-    <div class="col-12 col-sm-6 col-lg-4">
-      <a href="{{ route('admin.announcements.index') }}" class="card-link">
-        <div class="dash-card p-3">
-          <h5 class="fw-bold text-success">Announcements</h5>
-          <div class="text-muted small mb-3">Post updates</div>
-          <span class="btn btn-success btn-sm">Manage</span>
-        </div>
-      </a>
-    </div>
+            <h5 class="fw-bold text-success">
+              {{ $module['title'] }}
+            </h5>
 
-    <div class="col-12 col-sm-6 col-lg-4">
-      <a href="{{ route('admin.notifications') }}" class="card-link">
-        <div class="dash-card p-3">
-          <h5 class="fw-bold text-success">Notifications</h5>
-          <div class="text-muted small mb-3">View admin alerts</div>
-          <span class="btn btn-success btn-sm">Open</span>
-        </div>
-      </a>
-    </div>
+            <div class="text-muted small mb-3">
+              {{ $module['text'] }}
+            </div>
+
+            <span class="btn btn-success btn-sm">
+              {{ $module['button'] }}
+            </span>
+          </div>
+        </a>
+      </div>
+    @endforeach
 
   </div>
 
@@ -209,6 +359,7 @@
 
     <div class="col-6 col-md-3">
       <div class="dash-card p-3">
+        <div class="stat-icon"><i class="bi bi-person-fill"></i></div>
         <div class="text-muted small">Farmers</div>
         <h4 class="fw-bold text-success">{{ $activeFarmers ?? 0 }}</h4>
       </div>
@@ -216,6 +367,7 @@
 
     <div class="col-6 col-md-3">
       <div class="dash-card p-3">
+        <div class="stat-icon"><i class="bi bi-people"></i></div>
         <div class="text-muted small">Beneficiaries</div>
         <h4 class="fw-bold text-success">{{ $beneficiaries ?? 0 }}</h4>
       </div>
@@ -223,6 +375,7 @@
 
     <div class="col-6 col-md-3">
       <div class="dash-card p-3">
+        <div class="stat-icon"><i class="bi bi-box-seam"></i></div>
         <div class="text-muted small">Rice Stock</div>
         <h4 class="fw-bold text-success">{{ $currentStock ?? 0 }}</h4>
       </div>
@@ -230,6 +383,7 @@
 
     <div class="col-6 col-md-3">
       <div class="dash-card p-3">
+        <div class="stat-icon"><i class="bi bi-person-exclamation"></i></div>
         <div class="text-muted small">Pending</div>
         <h4 class="fw-bold text-success">{{ $pendingApprovals ?? 0 }}</h4>
       </div>
@@ -238,11 +392,23 @@
   </div>
 
   {{-- RECENT ACTIVITY --}}
-  <div class="dash-card p-3 mb-4">
-    <h5 class="fw-bold mb-3 text-success">Recent Activities</h5>
+  <section class="dash-card p-3 mb-4">
+    <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
+      <div>
+        <h5 class="fw-bold mb-0 text-success">Recent Activities</h5>
+        <small class="text-muted">
+          System transaction overview
+        </small>
+      </div>
 
-    <div class="table-responsive">
-      <table class="table table-bordered">
+      <a href="{{ route('notifications.index') }}" class="btn btn-outline-success btn-sm">
+        <i class="bi bi-bell"></i>
+        All Alerts
+      </a>
+    </div>
+
+    <div class="table-responsive desktop-activity">
+      <table class="table table-bordered align-middle mb-0">
         <thead class="table-light">
           <tr>
             <th>Module</th>
@@ -254,30 +420,54 @@
         <tbody>
           <tr>
             <td>Approvals</td>
-            <td>New farmer account submitted</td>
-            <td><span class="badge bg-warning">Pending</span></td>
-            <td>{{ now()->format('M d, Y') }}</td>
+            <td>New account registrations appear in the notification bell.</td>
+            <td><span class="badge bg-warning text-dark">Live</span></td>
+            <td>{{ now()->timezone('Asia/Manila')->format('M d, Y') }}</td>
           </tr>
 
           <tr>
-            <td>Inventory</td>
-            <td>Stock updated</td>
-            <td><span class="badge bg-success">Completed</span></td>
-            <td>{{ now()->format('M d, Y') }}</td>
+            <td>Marketplace</td>
+            <td>Orders, payments and delivery updates are monitored.</td>
+            <td><span class="badge bg-success">Active</span></td>
+            <td>{{ now()->timezone('Asia/Manila')->format('M d, Y') }}</td>
           </tr>
 
           <tr>
-            <td>Distribution</td>
-            <td>Schedule created</td>
-            <td><span class="badge bg-success">Scheduled</span></td>
-            <td>{{ now()->format('M d, Y') }}</td>
+            <td>Milling</td>
+            <td>Admin can request milling and track Miller schedules, payments, proof and completion.</td>
+            <td><span class="badge bg-success">Active</span></td>
+            <td>{{ now()->timezone('Asia/Manila')->format('M d, Y') }}</td>
           </tr>
         </tbody>
       </table>
     </div>
-  </div>
 
-</div>
+    <div class="recent-mobile">
+      <div class="activity-card">
+        <strong>Account Approvals</strong>
+        <div class="small text-muted">
+          New account registrations notify the admin bell.
+        </div>
+      </div>
 
+      <div class="activity-card">
+        <strong>Marketplace Transactions</strong>
+        <div class="small text-muted">
+          Orders, approvals, payment and delivery updates are monitored.
+        </div>
+      </div>
+
+      <div class="activity-card">
+        <strong>Milling Transactions</strong>
+        <div class="small text-muted">
+          Admin can send milling requests to a selected Miller and track the complete transaction.
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

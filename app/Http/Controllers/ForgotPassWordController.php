@@ -42,7 +42,11 @@ class ForgotPasswordController extends Controller
             ]
         );
 
-        Mail::to($request->email)->send(new OtpMail($otp));
+        Mail::to($request->email)->send(new OtpMail(
+            $otp,
+            'ANI-CARE Password Reset Verification Code',
+            'password_reset'
+        ));
 
         return redirect()->route('otp.form')
             ->with('email',$request->email)

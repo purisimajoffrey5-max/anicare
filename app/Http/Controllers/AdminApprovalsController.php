@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\AccountApprovedMail;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class AdminApprovalsController extends Controller
 {
@@ -62,6 +64,10 @@ class AdminApprovalsController extends Controller
         $user->is_approved = 1;
         $user->approved_at = now();
         $user->save();
+
+        if (!empty($user->email)) {
+            Mail::to($user->email)->send(new AccountApprovedMail($user->fullname ?: $user->username));
+        }
 
         return back()->with('success', 'User approved successfully.');
     }

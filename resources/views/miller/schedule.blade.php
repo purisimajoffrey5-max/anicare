@@ -28,14 +28,18 @@
 
 <div class="container py-4" style="max-width:1100px;">
   <div class="d-flex justify-content-between align-items-center mb-3">
-    <div>
-      <h3 class="fw-bold text-success m-0">Schedule Milling</h3>
-      <div class="text-muted small">Live schedule view for assigned and approved requests.</div>
+  <div>
+    <h3 class="fw-bold text-success m-0">Schedule Milling</h3>
+    <div class="text-muted small">
+      Live schedule view for assigned and approved requests.
     </div>
-    <div class="d-flex gap-2 align-items-center">
-      <small class="text-muted">Auto-refreshes every 30s</small>
-      <a href="{{ route('miller.dashboard') }}" class="btn btn-outline-success btn-sm">Back</a>
-    </div>
+  </div>
+
+  <a href="{{ route('miller.dashboard') }}"
+     class="btn btn-outline-success btn-sm">
+    Back
+  </a>
+</div>
   </div>
 
   @if(session('success'))

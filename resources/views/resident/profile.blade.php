@@ -1,127 +1,405 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <title>My Profile | Resident</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- Mobile responsive helpers -->
-  <style>
-    html { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-    *, *::before, *::after { box-sizing: inherit; }
-    body { min-height: 100vh; margin: 0; }
-    img, video, iframe, svg, canvas { max-width: 100%; height: auto; }
-    .container, .container-fluid { width: 100% !important; max-width: 100% !important; padding-left: 1rem !important; padding-right: 1rem !important; }
-    .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-    .table-responsive table { min-width: 100%; }
-    .leaflet-container, #registrationMap, #residentMap, #orderMap, #trackMap { width: 100% !important; max-width: 100%; }
-    .card, .card-body { word-wrap: break-word; }
-    .btn, .form-control, .form-select, .input-group, .form-check-input { min-width: 0; }
-    @media (max-width: 768px) {
-      .navbar, .topbar { flex-wrap: wrap !important; }
-      .navbar-brand, .navbar-nav, .btn { width: 100% !important; text-align: center !important; }
-      .table-responsive { margin-left: -1rem !important; margin-right: -1rem !important; padding-left: 1rem !important; padding-right: 1rem !important; }
-    }
-  </style>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-  <style>
-    #residentMap { height: 320px; border-radius: 14px; border: 1px solid rgba(0,0,0,.10); }
-    .leaflet-container { background: #f8f9fa; }
-  </style>
+    <meta charset="UTF-8">
+
+    <title>My Profile | Resident</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+    >
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background: #f4f6f8;
+            color: #212529;
+        }
+
+        .profile-container {
+            max-width: 750px;
+            margin: 0 auto;
+            padding: 30px 18px 50px;
+        }
+
+        .profile-title {
+            color: #198754;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .profile-subtitle {
+            color: #6c757d;
+            font-size: 14px;
+        }
+
+        .profile-card {
+            border: none;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, .08);
+        }
+
+        .profile-header-box {
+            background: #f0faf4;
+            border: 1px solid #d4edda;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 25px;
+        }
+
+        .profile-header-box i {
+            color: #198754;
+            font-size: 24px;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 7px;
+        }
+
+        .form-control {
+            min-height: 48px;
+            border-radius: 9px;
+        }
+
+        .form-control:focus {
+            border-color: #198754;
+            box-shadow: 0 0 0 .2rem rgba(25, 135, 84, .15);
+        }
+
+        textarea.form-control {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .input-group-text {
+            background: #f8f9fa;
+            border-radius: 9px 0 0 9px;
+            min-width: 48px;
+            justify-content: center;
+        }
+
+        .btn-save {
+            min-height: 50px;
+            border-radius: 9px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .btn-back {
+            white-space: nowrap;
+        }
+
+        @media (max-width: 768px) {
+            .profile-container {
+                padding: 20px 12px 40px;
+            }
+
+            .profile-card .card-body {
+                padding: 20px !important;
+            }
+
+            .profile-title {
+                font-size: 25px;
+            }
+        }
+    </style>
 </head>
-<body class="bg-light">
 
-<div class="container py-4" style="max-width:700px;">
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <div>
-      <h3 class="fw-bold text-success m-0">My Profile</h3>
-      <div class="text-muted small">Update your account information</div>
-    </div>
-    <a href="{{ route('resident.dashboard') }}" class="btn btn-outline-success btn-sm">Back</a>
-  </div>
+<body>
 
-  @if(session('success'))
-    <div class="alert alert-success">{{ session('success') }}</div>
-  @endif
+<div class="profile-container">
 
-  @if($errors->any())
-    <div class="alert alert-danger">{{ $errors->first() }}</div>
-  @endif
+    {{-- HEADER --}}
+    <div class="d-flex justify-content-between align-items-center mb-4">
 
-  <div class="card shadow-sm">
-    <div class="card-body p-4">
-      <form method="POST" action="{{ route('resident.profile.update') }}">
-        @csrf
+        <div>
+            <h2 class="profile-title">
+                <i class="bi bi-person-circle"></i>
+                My Profile
+            </h2>
 
-        <div class="mb-3">
-          <label class="form-label">Full Name</label>
-          <input type="text" name="fullname" class="form-control" value="{{ old('fullname', $user->fullname) }}" required>
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label">Email (optional)</label>
-          <input type="email" name="email" class="form-control" value="{{ old('email', $user->email) }}">
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label">Delivery Location</label>
-          <div class="text-muted small mb-2">Click the map to save your delivery coordinates. This helps track your orders and show your address on the order map.</div>
-          <input id="resident_lat" type="hidden" name="latitude" value="{{ old('latitude', $user->latitude) }}">
-          <input id="resident_lng" type="hidden" name="longitude" value="{{ old('longitude', $user->longitude) }}">
-          <div id="residentMap"></div>
-          <div class="row mt-3">
-            <div class="col">
-              <label class="form-label">Latitude</label>
-              <input id="resident_lat_display" type="text" class="form-control" value="{{ old('latitude', $user->latitude) }}" readonly>
+            <div class="profile-subtitle">
+                Update your account information
             </div>
-            <div class="col">
-              <label class="form-label">Longitude</label>
-              <input id="resident_lng_display" type="text" class="form-control" value="{{ old('longitude', $user->longitude) }}" readonly>
-            </div>
-          </div>
         </div>
 
-        <button class="btn btn-success w-100">Save Changes</button>
-      </form>
+        <a href="{{ route('resident.dashboard') }}"
+           class="btn btn-outline-success btn-sm btn-back">
+
+            <i class="bi bi-arrow-left"></i>
+            Back
+
+        </a>
     </div>
-  </div>
+
+
+    {{-- SUCCESS MESSAGE --}}
+    @if(session('success'))
+
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+
+            <i class="bi bi-check-circle-fill me-1"></i>
+
+            {{ session('success') }}
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert">
+            </button>
+
+        </div>
+
+    @endif
+
+
+    {{-- VALIDATION ERRORS --}}
+    @if($errors->any())
+
+        <div class="alert alert-danger">
+
+            <div class="fw-bold mb-2">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                Please check the following:
+            </div>
+
+            <ul class="mb-0">
+
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+
+            </ul>
+
+        </div>
+
+    @endif
+
+
+    <div class="card profile-card">
+
+        <div class="card-body p-4">
+
+            <div class="profile-header-box">
+
+                <div class="d-flex align-items-center gap-3">
+
+                    <i class="bi bi-person-vcard"></i>
+
+                    <div>
+                        <div class="fw-bold">
+                            Resident Information
+                        </div>
+
+                        <div class="small text-muted">
+                            Keep your personal and delivery information updated.
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <form method="POST"
+                  action="{{ route('resident.profile.update') }}">
+
+                @csrf
+
+                {{-- FULL NAME --}}
+                <div class="mb-4">
+
+                    <label for="fullname"
+                           class="form-label">
+
+                        Full Name
+
+                    </label>
+
+                    <div class="input-group">
+
+                        <span class="input-group-text">
+                            <i class="bi bi-person"></i>
+                        </span>
+
+                        <input
+                            type="text"
+                            id="fullname"
+                            name="fullname"
+                            class="form-control"
+                            value="{{ old('fullname', $user->fullname ?? '') }}"
+                            placeholder="Enter your full name"
+                            required
+                        >
+
+                    </div>
+
+                    @error('fullname')
+                        <div class="text-danger small mt-1">
+                            {{ $message }}
+                        </div>
+                    @enderror
+
+                </div>
+
+
+                {{-- EMAIL --}}
+                <div class="mb-4">
+
+                    <label for="email"
+                           class="form-label">
+
+                        Email Address
+
+                    </label>
+
+                    <div class="input-group">
+
+                        <span class="input-group-text">
+                            <i class="bi bi-envelope"></i>
+                        </span>
+
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            class="form-control"
+                            value="{{ old('email', $user->email ?? '') }}"
+                            placeholder="example@email.com"
+                        >
+
+                    </div>
+
+                    @error('email')
+                        <div class="text-danger small mt-1">
+                            {{ $message }}
+                        </div>
+                    @enderror
+
+                </div>
+
+
+                {{-- MOBILE NUMBER --}}
+                <div class="mb-4">
+
+                    <label for="mobile_number"
+                           class="form-label">
+
+                        Mobile Number
+
+                    </label>
+
+                    <div class="input-group">
+
+                        <span class="input-group-text">
+                            <i class="bi bi-phone"></i>
+                        </span>
+
+                        <input
+                            type="text"
+                            id="mobile_number"
+                            name="mobile_number"
+                            class="form-control"
+                            value="{{ old(
+                                'mobile_number',
+                                $user->mobile_number
+                                ?? $user->contact_number
+                                ?? $user->phone
+                                ?? ''
+                            ) }}"
+                            placeholder="09XXXXXXXXX"
+                            maxlength="20"
+                            required
+                        >
+
+                    </div>
+
+                    @error('mobile_number')
+                        <div class="text-danger small mt-1">
+                            {{ $message }}
+                        </div>
+                    @enderror
+
+                </div>
+
+
+                {{-- ADDRESS --}}
+                <div class="mb-4">
+
+                    <label for="address"
+                           class="form-label">
+
+                        Address
+
+                    </label>
+
+                    <div class="input-group">
+
+                        <span class="input-group-text align-items-start pt-3">
+                            <i class="bi bi-geo-alt"></i>
+                        </span>
+
+                        <textarea
+                            id="address"
+                            name="address"
+                            class="form-control"
+                            placeholder="Enter your complete address"
+                            required
+                        >{{ old('address', $user->address ?? '') }}</textarea>
+
+                    </div>
+
+                    <div class="form-text">
+                        Example: Barangay, Municipality, Province
+                    </div>
+
+                    @error('address')
+                        <div class="text-danger small mt-1">
+                            {{ $message }}
+                        </div>
+                    @enderror
+
+                </div>
+
+
+                {{-- SAVE BUTTON --}}
+                <button type="submit"
+                        class="btn btn-success btn-save w-100">
+
+                    <i class="bi bi-check-circle me-1"></i>
+                    Save Changes
+
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
 </div>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script>
-  const savedLat = {{ $user->latitude !== null ? (float) $user->latitude : 'null' }};
-  const savedLng = {{ $user->longitude !== null ? (float) $user->longitude : 'null' }};
-  const mapCenter = savedLat !== null && savedLng !== null ? [savedLat, savedLng] : [18.2760, 121.6440];
-  const residentMap = L.map('residentMap').setView(mapCenter, savedLat !== null && savedLng !== null ? 14 : 12);
 
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap contributors'
-  }).addTo(residentMap);
-
-  let residentMarker = null;
-
-  if (savedLat !== null && savedLng !== null) {
-    residentMarker = L.marker([savedLat, savedLng]).addTo(residentMap)
-      .bindPopup('Saved delivery location').openPopup();
-  }
-
-  residentMap.on('click', function(e) {
-    const lat = e.latlng.lat.toFixed(8);
-    const lng = e.latlng.lng.toFixed(8);
-
-    if (residentMarker) {
-      residentMap.removeLayer(residentMarker);
-    }
-
-    residentMarker = L.marker([lat, lng]).addTo(residentMap)
-      .bindPopup('Delivery location saved').openPopup();
-
-    document.getElementById('resident_lat').value = lat;
-    document.getElementById('resident_lng').value = lng;
-    document.getElementById('resident_lat_display').value = lat;
-    document.getElementById('resident_lng_display').value = lng;
-  });
+<script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js">
 </script>
+
 </body>
 </html>
-

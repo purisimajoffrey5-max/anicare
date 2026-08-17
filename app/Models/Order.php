@@ -25,6 +25,8 @@ class Order extends Model
         'delivery_address',
         'pickup_address',
         'payment_method',
+        'delivery_latitude',
+        'delivery_longitude',
         'notes',
     ];
 
