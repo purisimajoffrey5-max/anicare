@@ -83,6 +83,13 @@
             box-shadow: 0 0 0 .2rem rgba(25, 135, 84, .15);
         }
 
+        .vat-summary-row {
+            background: #f8faf9;
+            border-radius: 6px;
+            padding-left: 8px;
+            padding-right: 8px;
+        }
+
         .readonly-field {
             background: #f8f9fa !important;
         }
@@ -1181,6 +1188,18 @@
                         </strong>
                     </div>
 
+                    @if($vatEnabled)
+    <div class="summary-row vat-summary-row">
+        <span>VATable Sales</span>
+        <strong id="vatableSalesDisplay">₱0.00</strong>
+    </div>
+
+    <div class="summary-row vat-summary-row">
+        <span>VAT ({{ number_format((float)$vatRate, 2) }}%)</span>
+        <strong id="vatAmountDisplay">₱0.00</strong>
+    </div>
+@endif
+
 
                     <div class="summary-row">
                         <span>Distance</span>
@@ -1239,6 +1258,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const KG_PER_SACK = Number(@json($kgPerSack));
     const AVAILABLE_KILOS = @json($availableKilos !== null ? (float) $availableKilos : null);
     const AVAILABLE_SACKS = @json($availableSacks !== null ? (int) $availableSacks : null);
+    const VAT_ENABLED = @json($vatEnabled);
+    const VAT_RATE = @json((float) $vatRate) / 100;
 
     const INITIAL_BUYER_ADDRESS = @json($buyerAddress);
     let BUYER_ADDRESS = (document.getElementById('deliveryAddress')?.value || INITIAL_BUYER_ADDRESS || '').trim();
@@ -1365,6 +1386,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const shippingDisplay =
         document.getElementById('shippingDisplay');
+
+    const vatableSalesDisplay =
+        document.getElementById('vatableSalesDisplay');
+
+    const vatAmountDisplay =
+        document.getElementById('vatAmountDisplay');
+
+    const totalSalesDisplay =
+        document.getElementById('totalSalesDisplay');
 
     const distanceDisplay =
         document.getElementById('distanceDisplay');
@@ -2002,6 +2032,17 @@ document.addEventListener('DOMContentLoaded', function () {
         const grandTotal =
             subtotal +
             shipping;
+
+        if (VAT_ENABLED && vatableSalesDisplay && vatAmountDisplay && totalSalesDisplay) {
+            const vatableSales =
+                Math.round((grandTotal / (1 + VAT_RATE)) * 100) / 100;
+            const vatAmount =
+                Math.round((grandTotal - vatableSales) * 100) / 100;
+
+            vatableSalesDisplay.textContent = money(vatableSales);
+            vatAmountDisplay.textContent = money(vatAmount);
+            totalSalesDisplay.textContent = money(grandTotal);
+        }
 
         grandTotalDisplay.textContent =
             money(grandTotal);

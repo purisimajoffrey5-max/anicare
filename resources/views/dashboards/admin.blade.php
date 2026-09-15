@@ -198,7 +198,7 @@
 
     <div class="brand">
       <i class="bi bi-shield-check me-1"></i>
-      ANI-CARE | Admin
+      ANI-CARE | LGU
     </div>
 
     <div class="top-actions">
@@ -251,6 +251,14 @@
           'title' => 'Inventory',
           'text' => 'Track purchased rice and palay stock',
           'button' => 'View',
+          'class' => '',
+        ],
+        [
+          'route' => 'admin.reports',
+          'icon' => 'bi-file-earmark-bar-graph-fill',
+          'title' => 'Reports',
+          'text' => 'View all product purchases and milling transactions',
+          'button' => 'View Reports',
           'class' => '',
         ],
 
@@ -315,6 +323,14 @@
           'title' => 'Announcements',
           'text' => 'Post system updates',
           'button' => 'Manage',
+          'class' => '',
+        ],
+        [
+          'route' => 'admin.reports.vat.settings',
+          'icon' => 'bi-percent',
+          'title' => 'Central VAT Setting',
+          'text' => 'Configure VAT rate and enable or disable VAT',
+          'button' => 'Open Settings',
           'class' => '',
         ],
         [

@@ -37,7 +37,16 @@
 <div class="page">
     <div class="actions">
         <a href="{{ route('resident.orders.index') }}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> My Orders</a>
-        <a href="{{ route('resident.orders.invoice.download', $invoice['order_id']) }}" class="btn btn-success"><i class="bi bi-file-earmark-pdf"></i> Download PDF</a>
+        <a
+    href="{{ route(
+        'resident.orders.invoice.download',
+        $invoice['order_id']
+    ) }}"
+    class="btn btn-success"
+>
+    <i class="bi bi-file-earmark-pdf"></i>
+    Prepare PDF
+</a>
         <button class="btn btn-outline-success" onclick="window.print()"><i class="bi bi-printer"></i> Print</button>
     </div>
 

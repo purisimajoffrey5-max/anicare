@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\RiceProduct;
 use App\Services\OrderInvoiceService;
+use App\Services\VatService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -717,9 +718,13 @@ class AdminOrderController extends Controller
             ->where('is_active', 1)
             ->firstOrFail();
 
+        // Admin-controlled VAT setting used by the checkout Order Summary.
+        $vatEnabled = VatService::enabled();
+        $vatRate = VatService::rate();
+
         return view(
             'admin.checkout',
-            compact('user', 'product')
+            compact('user', 'product', 'vatEnabled', 'vatRate')
         );
     }
 
@@ -1064,6 +1069,10 @@ class AdminOrderController extends Controller
                 $grandTotal =
                     $subtotal + $shippingFee;
 
+                // Admin-controlled VAT is an inclusive breakdown; it never
+                // increases the customer's existing grand total.
+                $vat = VatService::breakdown($grandTotal);
+
                 $paymentMethod =
                     $grandTotal >= 100000
                         ? 'check'
@@ -1104,6 +1113,21 @@ class AdminOrderController extends Controller
 
                     'total_price' =>
                         round($subtotal, 2),
+
+                    'vat_enabled' =>
+                        $vat['enabled'],
+
+                    'vat_rate' =>
+                        $vat['rate'],
+
+                    'vatable_sales' =>
+                        $vat['vatable_sales'],
+
+                    'vat_amount' =>
+                        $vat['vat'],
+
+                    'total_sales' =>
+                        $vat['total_sales'],
 
                     'status' =>
                         'pending',

@@ -580,6 +580,40 @@
                 width:100%;
             }
         }
+    
+        .vat-summary-row {
+            background: #f8faf9;
+            border-radius: 6px;
+            padding: 7px 9px;
+            margin-top: 4px;
+        }
+    
+        .cost-card{
+            background:#fff;
+            border:1px solid #e4e9e6;
+            border-radius:12px;
+            padding:12px;
+            margin-top:12px;
+        }
+        .cost-row{
+            display:flex;
+            justify-content:space-between;
+            gap:10px;
+            padding:7px 0;
+            font-size:12px;
+        }
+        .cost-grand{
+            border-top:1px solid #e5e7eb;
+            margin-top:4px;
+            padding-top:10px;
+            font-weight:800;
+        }
+        .vat-summary-row{
+            background:#f8faf9;
+            border-radius:6px;
+            padding:7px 9px;
+            margin-top:4px;
+        }
     </style>
 </head>
 
@@ -944,6 +978,17 @@
                         </div>
 
 
+                        <div class="cost-card mb-3">
+                            <div class="cost-row"><span>Milling fee</span><strong id="millingFeeDisplay">₱0.00</strong></div>
+                            <div class="cost-row"><span>Shipping fee</span><strong id="shippingFeeDisplay">₱0.00</strong></div>
+                            @if($vatEnabled)
+                                <div class="cost-row vat-summary-row"><span>VATable Sales</span><strong id="vatableSalesDisplay">₱0.00</strong></div>
+                                <div class="cost-row vat-summary-row"><span>VAT ({{ number_format((float)$vatRate, 2) }}%)</span><strong id="vatAmountDisplay">₱0.00</strong></div>
+                                <div class="cost-row vat-summary-row"><span>Total Sales (VAT Inclusive)</span><strong id="totalSalesDisplay">₱0.00</strong></div>
+                            @endif
+                            <div class="cost-row cost-grand"><span>Estimated Grand Total</span><span id="grandTotalDisplay">₱0.00</span></div>
+                        </div>
+
                         <button
                             type="submit"
                             class="btn btn-success submit-btn w-100 mb-2"
@@ -1273,6 +1318,33 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+
+    const VAT_ENABLED = @json($vatEnabled);
+    const VAT_RATE = @json((float) $vatRate) / 100;
+    const MILLING_RATE = 2.50;
+
+    function money(value) {
+        return '₱' + Number(value || 0).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function updateFarmerVatSummary() {
+        const kilos = Number(document.querySelector('[name="kilos"]')?.value || 0);
+        const millingFee = Math.round((kilos * MILLING_RATE) * 100) / 100;
+        const grandTotal = millingFee;
+        const millingEl = document.getElementById('millingFeeDisplay');
+        const shippingEl = document.getElementById('shippingFeeDisplay');
+        const grandEl = document.getElementById('grandTotalDisplay');
+        if (millingEl) millingEl.textContent = money(millingFee);
+        if (shippingEl) shippingEl.textContent = money(0);
+        if (grandEl) grandEl.textContent = money(grandTotal);
+        if (VAT_ENABLED) {
+            const vatableSales = Math.round((grandTotal / (1 + VAT_RATE)) * 100) / 100;
+            const vatAmount = Math.round((grandTotal - vatableSales) * 100) / 100;
+            document.getElementById('vatableSalesDisplay')?.replaceChildren(document.createTextNode(money(vatableSales)));
+            document.getElementById('vatAmountDisplay')?.replaceChildren(document.createTextNode(money(vatAmount)));
+            document.getElementById('totalSalesDisplay')?.replaceChildren(document.createTextNode(money(grandTotal)));
+        }
+    }
 
     /*
     |--------------------------------------------------------------------------
@@ -2135,6 +2207,9 @@ document.addEventListener('DOMContentLoaded', function () {
         );
 
 
+    document.querySelector('[name="kilos"]')?.addEventListener('input', updateFarmerVatSummary);
+    updateFarmerVatSummary();
+
     setTimeout(
         function () {
             map.invalidateSize();
@@ -2142,6 +2217,7 @@ document.addEventListener('DOMContentLoaded', function () {
         150
     );
 });
+
 </script>
 
 </body>

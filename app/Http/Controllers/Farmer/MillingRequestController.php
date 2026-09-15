@@ -10,12 +10,14 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Services\VatService;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class MillingRequestController extends Controller
 {
+    private const DEFAULT_MILLING_FEE_PER_KG = 2.50;
     /*
     |--------------------------------------------------------------------------
     | REQUIRE FARMER
@@ -68,9 +70,12 @@ class MillingRequestController extends Controller
                 'is_open',
             ]);
 
+        $vatEnabled = VatService::enabled();
+        $vatRate = VatService::rate();
+
         return view(
             'farmer.milling.create',
-            compact('millers')
+            compact('millers', 'vatEnabled', 'vatRate')
         );
     }
 
@@ -176,6 +181,12 @@ class MillingRequestController extends Controller
         }
 
 
+        $millingTotal = round(((float) $data['kilos']) * self::DEFAULT_MILLING_FEE_PER_KG, 2);
+
+        $grandTotal = $millingTotal;
+
+        $vat = VatService::breakdown($grandTotal);
+
         try {
 
             $millingRequest = DB::transaction(
@@ -183,7 +194,10 @@ class MillingRequestController extends Controller
                     $data,
                     $farmer,
                     $miller,
-                    $farmerAddress
+                    $farmerAddress,
+                    $millingTotal,
+                    $grandTotal,
+                    $vat
                 ) {
 
                     $payload = [];
@@ -420,19 +434,19 @@ class MillingRequestController extends Controller
                     $this->putIfColumnExists(
                         $payload,
                         'milling_fee_per_kg',
-                        0
+                        self::DEFAULT_MILLING_FEE_PER_KG
                     );
 
                     $this->putIfColumnExists(
                         $payload,
                         'total_amount',
-                        0
+                        $millingTotal
                     );
 
                     $this->putIfColumnExists(
                         $payload,
                         'grand_total',
-                        0
+                        $grandTotal
                     );
 
 

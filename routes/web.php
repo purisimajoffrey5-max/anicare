@@ -13,6 +13,8 @@ use App\Http\Controllers\Admin\AdminMarketplaceController;
 use App\Http\Controllers\Admin\AdminOrderController;
 use App\Http\Controllers\Admin\AdminDistributionController;
 use App\Http\Controllers\Admin\AdminMillingRequestController;
+use App\Http\Controllers\Admin\AdminReportController;
+use App\Http\Controllers\Admin\VatSettingsController;
 
 use App\Http\Controllers\Farmer\DashboardController as FarmerDashboardController;
 use App\Http\Controllers\Farmer\FarmProfileController;
@@ -179,6 +181,22 @@ Route::middleware(['auth'])
             '/dashboard',
             fn () => view('dashboards.admin')
         )->name('dashboard');
+
+        /* ADMIN REPORTS / CENTRAL VAT SETTING */
+        Route::get(
+            '/reports',
+            [AdminReportController::class, 'index']
+        )->name('reports');
+
+        Route::get(
+            '/reports/vat',
+            [VatSettingsController::class, 'edit']
+        )->name('reports.vat.settings');
+
+        Route::post(
+            '/reports/vat',
+            [VatSettingsController::class, 'update']
+        )->name('reports.vat.update');
 
 
         Route::view(

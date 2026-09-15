@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\RiceProduct;
 use App\Services\OrderInvoiceService;
+use App\Services\VatService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -301,7 +302,10 @@ class OrderController extends Controller
             ->where('is_active', 1)
             ->firstOrFail();
 
-        return view('resident.checkout', compact('user', 'product'));
+        $vatEnabled = VatService::enabled();
+        $vatRate = VatService::rate();
+
+        return view('resident.checkout', compact('user', 'product', 'vatEnabled', 'vatRate'));
     }
 
     /**
@@ -656,6 +660,17 @@ class OrderController extends Controller
                 */
                 $grandTotal =
                     $subtotal + $shippingFee;
+
+                /*
+                | VAT / RECEIPT SETTING
+                |
+                | The Admin VAT toggle is authoritative. VAT is treated as
+                | inclusive, so enabling VAT does not unexpectedly add another
+                | 12% on top of the customer's existing amount.
+                |
+                | The saved Central VAT rate determines the VAT breakdown.
+                */
+                $vat = VatService::breakdown($grandTotal);
 
                 $paymentMethod =
                     $grandTotal >= 100000

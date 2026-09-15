@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Announcements | ANI-CARE Admin</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Mobile responsive helpers -->
+  <style>
+    html { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+    *, *::before, *::after { box-sizing: inherit; }
+    body { min-height: 100vh; margin: 0; }
+    img, video, iframe, svg, canvas { max-width: 100%; height: auto; }
+    .container, .container-fluid { width: 100% !important; max-width: 100% !important; padding-left: 1rem !important; padding-right: 1rem !important; }
+    .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .table-responsive table { min-width: 100%; }
+    .leaflet-container, #registrationMap, #residentMap, #orderMap, #trackMap { width: 100% !important; max-width: 100%; }
+    .card, .card-body { word-wrap: break-word; }
+    .btn, .form-control, .form-select, .input-group, .form-check-input { min-width: 0; }
+    @media (max-width: 768px) {
+      .navbar, .topbar { flex-wrap: wrap !important; }
+      .navbar-brand, .navbar-nav, .btn { width: 100% !important; text-align: center !important; }
+      .table-responsive { margin-left: -1rem !important; margin-right: -1rem !important; padding-left: 1rem !important; padding-right: 1rem !important; }
+    }
+  </style>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+
+body{
+    background:#f4f6fb;
+    font-family: "Segoe UI", sans-serif;
+}
+
+.wrap{
+    max-width:1150px;
+    margin:auto;
+    padding:30px 18px 80px;
+}
+
+/* NAVBAR */
+.navbar-brand{
+    font-weight:700;
+    letter-spacing:.5px;
+}
+
+/* CARDS */
+.card-soft{
+    border:none;
+    border-radius:16px;
+    box-shadow:0 6px 18px rgba(0,0,0,0.06);
+}
+
+/* FORM STYLE */
+.form-control{
+    border-radius:10px;
+}
+
+.btn-soft{
+    border-radius:10px;
+    padding:6px 16px;
+}
+
+/* ANNOUNCEMENT TABLE */
+.table thead{
+    background:#f8f9fc;
+}
+
+.table td{
+    vertical-align:middle;
+}
+
+/* HEADER AREA */
+.page-title{
+    font-weight:700;
+}
+
+.page-sub{
+    font-size:.9rem;
+    color:#6c757d;
+}
+
+/* NOTICE PANEL */
+
+.notice-panel{
+    background:#e9f7ef;
+    border-left:4px solid #198754;
+    padding:12px 16px;
+    border-radius:8px;
+    font-size:.9rem;
+}
+
+</style>
+
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-dark" style="background:#198754;">
+<div class="container-fluid px-4">
+
+<span class="navbar-brand">ANI-CARE ALLACAPAN | Admin Panel</span>
+
+<div class="d-flex gap-2">
+
+<a href="<?php echo e(route('admin.dashboard')); ?>" class="btn btn-light btn-sm btn-soft">
+Dashboard
+</a>
+
+<a href="<?php echo e(route('admin.announcements.library')); ?>" class="btn btn-outline-light btn-sm btn-soft">
+Announcement Library
+</a>
+
+<form method="POST" action="<?php echo e(route('logout')); ?>" class="m-0">
+<?php echo csrf_field(); ?>
+<button class="btn btn-warning btn-sm btn-soft">
+Logout
+</button>
+</form>
+
+</div>
+</div>
+</nav>
+
+<div class="wrap">
+
+<!-- HEADER -->
+<div class="mb-4">
+
+<h3 class="page-title text-success mb-1">
+System Announcements
+</h3>
+
+<div class="page-sub">
+Manage official announcements that will appear on the dashboards of all system users.
+</div>
+
+</div>
+
+<!-- NOTICE -->
+<div class="notice-panel mb-4">
+Announcements posted here will automatically appear on the dashboards of residents, farmers, and millers.  
+Use this feature to publish important system updates, announcements, or public notices.
+</div>
+
+<?php if(session('success')): ?>
+<div class="alert alert-success">
+<?php echo e(session('success')); ?>
+
+</div>
+<?php endif; ?>
+
+<?php if($errors->any()): ?>
+<div class="alert alert-danger">
+<?php echo e($errors->first()); ?>
+
+</div>
+<?php endif; ?>
+
+
+<!-- CREATE ANNOUNCEMENT -->
+<div class="card card-soft p-4 mb-4">
+
+<h5 class="fw-semibold mb-3">
+Create New Announcement
+</h5>
+
+<form method="POST" action="<?php echo e(route('admin.announcements.store')); ?>">
+<?php echo csrf_field(); ?>
+
+<div class="row g-3">
+
+<div class="col-md-4">
+<label class="form-label small">Announcement Title</label>
+<input type="text" name="title" class="form-control"
+maxlength="120" required value="<?php echo e(old('title')); ?>">
+</div>
+
+<div class="col-md-8">
+<label class="form-label small">Announcement Message</label>
+<textarea name="message" rows="2" class="form-control"
+maxlength="5000" required><?php echo e(old('message')); ?></textarea>
+</div>
+
+<div class="col-12 d-flex justify-content-end mt-2">
+<button class="btn btn-success btn-soft px-4">
+Post Announcement
+</button>
+</div>
+
+</div>
+
+</form>
+
+</div>
+
+
+<!-- ACTIVE ANNOUNCEMENTS -->
+<div class="card card-soft p-4">
+
+<h5 class="fw-semibold mb-3">
+Active Announcements
+</h5>
+
+<div class="table-responsive">
+
+<table class="table table-hover align-middle">
+
+<thead>
+<tr>
+<th>ID</th>
+<th>Title</th>
+<th>Announcement</th>
+<th>Date Posted</th>
+<th class="text-end">Action</th>
+</tr>
+</thead>
+
+<tbody>
+
+<?php $__empty_1 = true; $__currentLoopData = $announcements; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $a): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+
+<tr>
+
+<td class="fw-semibold text-muted">
+#<?php echo e($a->id); ?>
+
+</td>
+
+<td class="fw-semibold">
+<?php echo e($a->title); ?>
+
+</td>
+
+<td class="text-muted">
+<?php echo e($a->message); ?>
+
+</td>
+
+<td class="small text-muted">
+<?php echo e($a->created_at?->format('F d, Y  H:i')); ?>
+
+</td>
+
+<td class="text-end">
+
+<form method="POST"
+action="<?php echo e(route('admin.announcements.archive', $a->id)); ?>"
+class="d-inline">
+
+<?php echo csrf_field(); ?>
+
+<button class="btn btn-outline-success btn-sm btn-soft"
+onclick="return confirm('Mark this announcement as completed? It will be moved to the library.')">
+
+Mark as Completed
+
+</button>
+
+</form>
+
+</td>
+
+</tr>
+
+<?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+
+<tr>
+<td colspan="5" class="text-center text-muted py-4">
+No active announcements available.
+</td>
+</tr>
+
+<?php endif; ?>
+
+</tbody>
+</table>
+
+</div>
+
+<div class="mt-3">
+<?php echo e($announcements->links()); ?>
+
+</div>
+
+</div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
+<?php /**PATH C:\xampp\htdocs\Allacapan_Anicare\resources\views/admin/announcements/index.blade.php ENDPATH**/ ?>

@@ -34,6 +34,11 @@ class Order extends Model
         'quantity_kilos' => 'decimal:2',
         'unit_price' => 'decimal:2',
         'total_price' => 'decimal:2',
+        'vat_enabled' => 'boolean',
+        'vat_rate' => 'decimal:4',
+        'vatable_sales' => 'decimal:2',
+        'vat_amount' => 'decimal:2',
+        'total_sales' => 'decimal:2',
     ];
 
     public function product()

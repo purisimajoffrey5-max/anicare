@@ -10,9 +10,31 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Http;
 
 class AuthController extends Controller
 {
+    private function verifyRecaptcha(Request $request): bool
+{
+    $response = $request->input('g-recaptcha-response');
+
+    if (!$response) {
+        return false;
+    }
+
+    $result = Http::asForm()->post(
+        'https://www.google.com/recaptcha/api/siteverify',
+        [
+            'secret' => config('services.recaptcha.secret_key'),
+            'response' => $response,
+            'remoteip' => $request->ip(),
+        ]
+    );
+
+    return $result->successful()
+        && $result->json('success') === true;
+}
+
     /*
     |--------------------------------------------------------------------------
     | SHOW LOGIN PAGE
@@ -51,6 +73,14 @@ class AuthController extends Controller
 
     public function register(Request $request)
     {
+        if (!$this->verifyRecaptcha($request)) {
+    return back()
+        ->withErrors([
+            'recaptcha' => 'Please complete the CAPTCHA verification.'
+        ])
+        ->withInput();
+}
+
         $data = $request->validate([
 
             /*
@@ -724,7 +754,14 @@ class AuthController extends Controller
     */
 
     public function login(Request $request)
-    {
+{
+    if (!$this->verifyRecaptcha($request)) {
+        return back()
+            ->withErrors([
+                'login' => 'Please complete the CAPTCHA verification.'
+            ])
+            ->withInput($request->only('username'));
+    }
         $request->validate([
 
             'username' => [

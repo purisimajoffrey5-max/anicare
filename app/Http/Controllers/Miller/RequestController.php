@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Services\VatService;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
@@ -661,6 +662,14 @@ class RequestController extends Controller
                 ) {
                     $mr->grand_total =
                         $grandTotal;
+                }
+
+                if (Schema::hasColumn('milling_requests', 'vat_enabled')) {
+                    $mr->vat_enabled = $vat['enabled'];
+                    $mr->vat_rate = $vat['rate'];
+                    $mr->vatable_sales = $vat['vatable_sales'];
+                    $mr->vat_amount = $vat['vat'];
+                    $mr->total_sales = $vat['total_sales'];
                 }
 
 

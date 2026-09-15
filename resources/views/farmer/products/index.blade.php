@@ -1,862 +1,1319 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <title>My Products | ANI-CARE</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1, viewport-fit=cover"
+    >
+
+    <title>My Products | ANI-CARE</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
 
     <style>
-
-    *{
-        margin:0;
-        padding:0;
-        box-sizing:border-box;
-    }
-
-    html{
-        scroll-behavior:smooth;
-    }
-
-    body{
-        background:#f5f7fb;
-        font-family:'Segoe UI',sans-serif;
-        color:#333;
-    }
-
-    a{
-        text-decoration:none;
-    }
-
-    img{
-        max-width:100%;
-        height:auto;
-    }
-
-    .page-title{
-        font-weight:700;
-        color:#198754;
-        margin-bottom:5px;
-    }
-
-    .page-subtitle{
-        color:#6c757d;
-        font-size:15px;
-    }
-
-    .toolbar{
-        display:flex;
-        justify-content:space-between;
-        align-items:center;
-        gap:15px;
-        margin-bottom:25px;
-        flex-wrap:wrap;
-    }
-
-    .toolbar-buttons{
-        display:flex;
-        gap:10px;
-        flex-wrap:wrap;
-    }
-
-    .card{
-        border:none;
-        border-radius:16px;
-        box-shadow:0 8px 24px rgba(0,0,0,.06);
-    }
-
-    .card-body{
-        padding:25px;
-    }
-
-    table{
-        margin-bottom:0;
-    }
-
-    thead{
-        background:#198754;
-        color:white;
-    }
-
-    thead th{
-        border:none !important;
-        font-weight:600;
-        white-space:nowrap;
-    }
-
-    tbody td{
-        vertical-align:middle;
-    }
-
-    .img-thumb{
-        width:80px;
-        height:60px;
-        object-fit:cover;
-        border-radius:10px;
-        border:1px solid #ddd;
-    }
-
-    .badge{
-        font-size:12px;
-        padding:7px 10px;
-        letter-spacing:.5px;
-    }
-
-    .price{
-        font-weight:700;
-        color:#198754;
-    }
-
-    .stock{
-        font-weight:600;
-    }
-
-    .action-buttons{
-        display:flex;
-        flex-wrap:wrap;
-        justify-content:flex-end;
-        gap:6px;
-    }
-
-    .restock-group{
-        display:flex;
-        width:180px;
-    }
-
-    .mobile-products{
-        display:none;
-    }
-
-    .mobile-card{
-
-        background:#fff;
-        border-radius:16px;
-        box-shadow:0 6px 20px rgba(0,0,0,.06);
-        margin-bottom:18px;
-        overflow:hidden;
-
-    }
-
-    .mobile-image{
-
-        width:100%;
-        height:210px;
-        object-fit:cover;
-        background:#eee;
-
-    }
-
-    .mobile-content{
-
-        padding:18px;
-
-    }
-
-    .mobile-title{
-
-        font-size:20px;
-        font-weight:700;
-        color:#198754;
-        margin-bottom:10px;
-
-    }
-
-    .mobile-info{
-
-        display:flex;
-        justify-content:space-between;
-        margin-bottom:10px;
-        flex-wrap:wrap;
-        gap:8px;
-
-    }
-
-    .mobile-label{
-
-        color:#6c757d;
-        font-size:14px;
-
-    }
-
-    .mobile-value{
-
-        font-weight:600;
-
-    }
-
-    .mobile-actions{
-
-        display:grid;
-        grid-template-columns:repeat(2,1fr);
-        gap:8px;
-        margin-top:15px;
-
-    }
-
-    .mobile-actions form{
-        width:100%;
-    }
-
-    .mobile-actions button{
-        width:100%;
-    }
-
-    @media(max-width:991px){
-
-        .table-responsive{
-            display:none;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        .mobile-products{
-            display:block;
+        :root {
+            --primary: #198754;
+            --primary-dark: #157347;
+            --primary-soft: #eefaf3;
+            --danger: #dc3545;
+            --blue: #0d6efd;
+            --bg: #f4f6f8;
+            --card: #ffffff;
+            --text: #1f2937;
+            --muted: #6b7280;
+            --border: #e5e7eb;
+            --shadow: 0 5px 18px rgba(15, 23, 42, .06);
         }
 
-    }
-
-    @media(max-width:768px){
-
-        .container{
-            padding-left:15px;
-            padding-right:15px;
+        html {
+            width: 100%;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
         }
 
-        .toolbar{
+        body {
+            width: 100%;
+            min-height: 100vh;
+            margin: 0;
+            overflow-x: hidden;
 
-            flex-direction:column;
-            align-items:flex-start;
+            background: var(--bg);
+            color: var(--text);
 
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+
+            -webkit-text-size-adjust: 100%;
         }
 
-        .toolbar-buttons{
-
-            width:100%;
-
+        a {
+            text-decoration: none;
         }
 
-        .toolbar-buttons .btn{
-
-            flex:1;
-
+        img {
+            display: block;
+            max-width: 100%;
         }
 
-        .card-body{
-
-            padding:18px;
-
+        button,
+        input,
+        a {
+            -webkit-tap-highlight-color: transparent;
         }
 
-        .page-title{
+        /* =========================================
+           PAGE WRAPPER
+        ========================================= */
 
-            font-size:28px;
+        .products-page {
+            width: 100%;
+            max-width: 1180px;
+            margin: 0 auto;
 
+            padding: 26px 16px 45px;
         }
 
-    }
+        /* =========================================
+           HEADER
+        ========================================= */
 
-    @media(max-width:576px){
+        .toolbar {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 20px;
 
-        .mobile-image{
-
-            height:180px;
-
+            margin-bottom: 22px;
         }
 
-        .mobile-title{
-
-            font-size:18px;
-
+        .page-heading {
+            min-width: 0;
         }
 
-        .mobile-actions{
+        .page-title {
+            margin: 0 0 5px;
 
-            grid-template-columns:1fr;
+            color: var(--primary);
 
+            font-size: 32px;
+            font-weight: 800;
+            line-height: 1.2;
         }
 
-    }
+        .page-subtitle {
+            margin: 0;
 
+            color: var(--muted);
+
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .toolbar-buttons {
+            flex-shrink: 0;
+
+            display: flex;
+            align-items: center;
+            gap: 9px;
+        }
+
+        .toolbar-buttons .btn {
+            min-height: 42px;
+
+            padding: 8px 15px;
+
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 9px;
+
+            font-size: 13px;
+            font-weight: 700;
+
+            white-space: nowrap;
+        }
+
+        /* =========================================
+           ALERT
+        ========================================= */
+
+        .alert {
+            border: 0;
+            border-radius: 12px;
+        }
+
+        /* =========================================
+           DESKTOP
+        ========================================= */
+
+        .desktop-products {
+            overflow: hidden;
+
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+
+            box-shadow: var(--shadow);
+        }
+
+        .desktop-products .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .desktop-products table {
+            min-width: 1050px;
+            margin: 0;
+        }
+
+        .desktop-products thead {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .desktop-products thead th {
+            padding: 14px;
+
+            border: 0 !important;
+
+            font-size: 13px;
+            font-weight: 700;
+
+            white-space: nowrap;
+        }
+
+        .desktop-products tbody td {
+            padding: 13px 14px;
+
+            vertical-align: middle;
+
+            font-size: 13px;
+        }
+
+        .img-thumb {
+            width: 78px;
+            height: 58px;
+
+            object-fit: cover;
+
+            border: 1px solid #ddd;
+            border-radius: 9px;
+        }
+
+        .price {
+            color: var(--primary);
+            font-weight: 800;
+        }
+
+        .stock {
+            font-weight: 700;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .restock-group {
+            width: 195px;
+        }
+
+        /* =========================================
+           MOBILE
+        ========================================= */
+
+        .mobile-products {
+            display: none;
+        }
+
+        .mobile-card {
+            overflow: hidden;
+
+            margin-bottom: 14px;
+
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+
+            box-shadow: var(--shadow);
+        }
+
+        .mobile-card:last-child {
+            margin-bottom: 0;
+        }
+
+        .mobile-image {
+            width: 100%;
+            height: 190px;
+
+            object-fit: cover;
+            object-position: center;
+
+            background: #f0f0f0;
+        }
+
+        .mobile-content {
+            padding: 16px;
+        }
+
+        .mobile-product-head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 10px;
+
+            margin-bottom: 14px;
+        }
+
+        .mobile-title {
+            min-width: 0;
+
+            color: var(--primary);
+
+            font-size: 18px;
+            font-weight: 800;
+            line-height: 1.25;
+
+            text-transform: uppercase;
+            overflow-wrap: anywhere;
+        }
+
+        .mobile-status {
+            flex-shrink: 0;
+        }
+
+        .mobile-status .badge {
+            padding: 6px 9px;
+
+            border-radius: 7px;
+
+            font-size: 10px;
+            letter-spacing: .3px;
+        }
+
+        /* =========================================
+           MOBILE PRODUCT INFORMATION
+        ========================================= */
+
+        .mobile-info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 9px;
+
+            margin-bottom: 14px;
+        }
+
+        .mobile-info-box {
+            min-width: 0;
+
+            padding: 10px 11px;
+
+            background: #f8fafc;
+
+            border: 1px solid #eef0f2;
+            border-radius: 10px;
+        }
+
+        .mobile-info-box.full {
+            grid-column: 1 / -1;
+        }
+
+        .mobile-label {
+            display: block;
+
+            margin-bottom: 3px;
+
+            color: #8a94a3;
+
+            font-size: 10px;
+            font-weight: 600;
+
+            text-transform: uppercase;
+            letter-spacing: .3px;
+        }
+
+        .mobile-value {
+            color: var(--text);
+
+            font-size: 13px;
+            font-weight: 700;
+            line-height: 1.35;
+
+            overflow-wrap: anywhere;
+        }
+
+        .mobile-value.price-value {
+            color: var(--primary);
+        }
+
+        /* =========================================
+           MOBILE ACTIONS
+        ========================================= */
+
+        .mobile-actions {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+
+            margin-top: 2px;
+            margin-bottom: 14px;
+        }
+
+        .mobile-actions form {
+            width: 100%;
+            min-width: 0;
+
+            margin: 0;
+        }
+
+        .mobile-actions .btn {
+            width: 100%;
+            min-height: 40px;
+
+            padding: 7px 8px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 8px;
+
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        /* =========================================
+           RESTOCK
+        ========================================= */
+
+        .mobile-restock {
+            padding-top: 13px;
+
+            border-top: 1px solid #edf0f2;
+        }
+
+        .mobile-restock-label {
+            display: block;
+
+            margin-bottom: 7px;
+
+            color: #374151;
+
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .mobile-restock .input-group {
+            width: 100%;
+        }
+
+        .mobile-restock .form-control {
+            min-width: 0;
+            min-height: 42px;
+
+            border-radius: 8px 0 0 8px;
+
+            font-size: 14px;
+        }
+
+        .mobile-restock .btn {
+            min-height: 42px;
+
+            padding-left: 15px;
+            padding-right: 15px;
+
+            border-radius: 0 8px 8px 0;
+
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        /* =========================================
+           DELETE
+        ========================================= */
+
+        .delete-form {
+            margin-top: 9px;
+        }
+
+        .delete-btn {
+            width: 100%;
+            min-height: 41px;
+
+            border-radius: 8px;
+
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        /* =========================================
+           EMPTY STATE
+        ========================================= */
+
+        .empty-state {
+            padding: 45px 15px;
+
+            text-align: center;
+
+            background: #fff;
+
+            border-radius: 16px;
+
+            box-shadow: var(--shadow);
+        }
+
+        .empty-state h5 {
+            margin-bottom: 5px;
+
+            color: #4b5563;
+            font-weight: 700;
+        }
+
+        .empty-state p {
+            margin-bottom: 14px;
+
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        /* =========================================
+           PAGINATION
+        ========================================= */
+
+        .pagination-wrap {
+            margin-top: 20px;
+        }
+
+        /* =========================================
+           TABLET
+        ========================================= */
+
+        @media (max-width: 991.98px) {
+
+            .desktop-products {
+                display: none;
+            }
+
+            .mobile-products {
+                display: block;
+            }
+
+            .products-page {
+                max-width: 760px;
+            }
+        }
+
+        /* =========================================
+           MOBILE
+        ========================================= */
+
+        @media (max-width: 767.98px) {
+
+            .products-page {
+                padding:
+                    20px
+                    12px
+                    calc(35px + env(safe-area-inset-bottom));
+            }
+
+            .toolbar {
+                align-items: stretch;
+                flex-direction: column;
+
+                gap: 14px;
+
+                margin-bottom: 18px;
+            }
+
+            .page-title {
+                font-size: 27px;
+            }
+
+            .page-subtitle {
+                font-size: 13px;
+            }
+
+            .toolbar-buttons {
+                width: 100%;
+
+                display: grid;
+                grid-template-columns:
+                    minmax(0, .85fr)
+                    minmax(0, 1.15fr);
+
+                gap: 8px;
+            }
+
+            .toolbar-buttons .btn {
+                width: 100%;
+                min-width: 0;
+
+                padding-left: 8px;
+                padding-right: 8px;
+
+                font-size: 12px;
+
+                white-space: normal;
+            }
+
+            .mobile-image {
+                height: 175px;
+            }
+
+            .mobile-content {
+                padding: 14px;
+            }
+
+            .mobile-title {
+                font-size: 17px;
+            }
+
+            .pagination-wrap {
+                overflow-x: auto;
+            }
+
+            .pagination {
+                flex-wrap: wrap;
+                gap: 2px;
+            }
+        }
+
+        /* =========================================
+           SMALL PHONE
+        ========================================= */
+
+        @media (max-width: 420px) {
+
+            .products-page {
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+
+            .page-title {
+                font-size: 25px;
+            }
+
+            .mobile-image {
+                height: 160px;
+            }
+
+            .mobile-content {
+                padding: 13px;
+            }
+
+            .mobile-info-grid {
+                gap: 7px;
+            }
+
+            .mobile-info-box {
+                padding: 9px;
+            }
+
+            .toolbar-buttons .btn {
+                min-height: 41px;
+                font-size: 11px;
+            }
+        }
+
+        /* =========================================
+           VERY SMALL PHONE
+        ========================================= */
+
+        @media (max-width: 340px) {
+
+            .toolbar-buttons {
+                grid-template-columns: 1fr;
+            }
+
+            .mobile-info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .mobile-info-box.full {
+                grid-column: auto;
+            }
+
+            .mobile-actions {
+                grid-template-columns: 1fr;
+            }
+
+            .mobile-image {
+                height: 150px;
+            }
+        }
     </style>
-
 </head>
 
-<body class="bg-light">
 
-<div class="container py-4">
+<body>
 
+<main class="products-page">
+
+    {{-- =========================================
+         HEADER
+    ========================================== --}}
     <div class="toolbar">
 
-        <div>
+        <div class="page-heading">
 
-            <h2 class="page-title">
+            <h1 class="page-title">
                 My Posted Products
-            </h2>
+            </h1>
 
-            <div class="page-subtitle">
+            <p class="page-subtitle">
                 Manage your rice and palay products.
-            </div>
+            </p>
 
         </div>
+
 
         <div class="toolbar-buttons">
 
-            <a href="{{ route('farmer.dashboard') }}"
-               class="btn btn-outline-success">
-
+            <a
+                href="{{ route('farmer.dashboard') }}"
+                class="btn btn-outline-success"
+            >
                 ← Back
-
             </a>
 
-            <a href="{{ route('farmer.products.create') }}"
-               class="btn btn-success">
-
+            <a
+                href="{{ route('farmer.products.create') }}"
+                class="btn btn-success"
+            >
                 + Post New Product
-
             </a>
 
         </div>
 
     </div>
 
+
+    {{-- =========================================
+         SUCCESS MESSAGE
+    ========================================== --}}
     @if(session('success'))
 
         <div class="alert alert-success shadow-sm">
-
             {{ session('success') }}
-
         </div>
 
     @endif
 
-    <div class="card">
 
-        <div class="card-body">
+    {{-- =========================================
+         DESKTOP TABLE
+    ========================================== --}}
+    <div class="desktop-products">
 
-            <!-- DESKTOP TABLE -->
+        <div class="table-responsive">
 
-            <div class="table-responsive">
+            <table class="table table-hover align-middle">
 
-                <table class="table table-hover align-middle">
+                <thead>
 
-                    <thead>
+                <tr>
 
-                        <tr>
+                    <th>ID</th>
+                    <th>Photo</th>
+                    <th>Product</th>
+                    <th>Type</th>
+                    <th>Price/kg</th>
+                    <th>Stock</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                    <th class="text-end">Actions</th>
 
-                            <th>ID</th>
-                            <th>Photo</th>
-                            <th>Product</th>
-                            <th>Type</th>
-                            <th>Price/kg</th>
-                            <th>Stock</th>
-                            <th>Status</th>
-                            <th>Created</th>
-                            <th class="text-end">Actions</th>
+                </tr>
 
-                        </tr>
+                </thead>
 
-                    </thead>
 
-                    <tbody>
-                      @forelse($products as $p)
+                <tbody>
 
-<tr>
+                @forelse($products as $p)
 
-    <td>
-        {{ $p->id }}
-    </td>
+                    <tr>
 
-    <td style="width:95px;">
+                        <td>
+                            {{ $p->id }}
+                        </td>
 
-        @if(!empty($p->photo_path))
 
-            <img
-                src="{{ asset('storage/'.$p->photo_path) }}"
-                class="img-thumb"
-                alt="{{ $p->name }}">
+                        <td style="width:95px;">
 
-        @else
+                            @if(!empty($p->photo_path))
 
-            <div class="text-muted small">
-                No Photo
-            </div>
+                                <img
+                                    src="{{ asset('storage/'.$p->photo_path) }}"
+                                    class="img-thumb"
+                                    alt="{{ $p->name }}"
+                                >
 
-        @endif
+                            @else
 
-    </td>
+                                <div class="text-muted small">
+                                    No Photo
+                                </div>
 
-    <td>
+                            @endif
 
-        <div class="fw-bold">
+                        </td>
 
-            {{ $p->name }}
+
+                        <td>
+
+                            <div class="fw-bold">
+                                {{ $p->name }}
+                            </div>
+
+                        </td>
+
+
+                        <td>
+
+                            <span class="badge bg-secondary">
+                                {{ strtoupper($p->type ?? '-') }}
+                            </span>
+
+                        </td>
+
+
+                        <td class="price">
+
+                            ₱{{ number_format(
+                                (float)($p->price_per_kg ?? 0),
+                                2
+                            ) }}
+
+                        </td>
+
+
+                        <td class="stock">
+
+                            {{ number_format(
+                                (float)($p->kilos_available ?? 0),
+                                2
+                            ) }} kg
+
+                        </td>
+
+
+                        <td>
+
+                            @if($p->is_active)
+
+                                <span class="badge bg-success">
+                                    ACTIVE
+                                </span>
+
+                            @else
+
+                                <span class="badge bg-danger">
+                                    INACTIVE
+                                </span>
+
+                            @endif
+
+                        </td>
+
+
+                        <td>
+                            {{ optional($p->created_at)->format('M d, Y') }}
+                        </td>
+
+
+                        <td>
+
+                            <div class="action-buttons">
+
+                                {{-- TOGGLE --}}
+                                <form
+                                    method="POST"
+                                    action="{{ route(
+                                        'farmer.products.toggle',
+                                        $p->id
+                                    ) }}"
+                                >
+                                    @csrf
+
+                                    <button
+                                        type="submit"
+                                        class="btn btn-outline-success btn-sm"
+                                        onclick="return confirm('Toggle product status?')"
+                                    >
+                                        Toggle
+                                    </button>
+
+                                </form>
+
+
+                                {{-- OUT OF STOCK --}}
+                                <form
+                                    method="POST"
+                                    action="{{ route(
+                                        'farmer.products.outOfStock',
+                                        $p->id
+                                    ) }}"
+                                >
+                                    @csrf
+
+                                    <button
+                                        type="submit"
+                                        class="btn btn-outline-danger btn-sm"
+                                        onclick="return confirm('Mark as out of stock?')"
+                                    >
+                                        Out of Stock
+                                    </button>
+
+                                </form>
+
+
+                                {{-- RESTOCK --}}
+                                <form
+                                    method="POST"
+                                    action="{{ route(
+                                        'farmer.products.restock',
+                                        $p->id
+                                    ) }}"
+                                >
+                                    @csrf
+
+                                    <div class="input-group input-group-sm restock-group">
+
+                                        <input
+                                            type="number"
+                                            name="kilos_available"
+                                            step="0.1"
+                                            min="0.1"
+                                            class="form-control"
+                                            value="{{
+                                                $p->kilos_available > 0
+                                                    ? number_format(
+                                                        $p->kilos_available,
+                                                        2,
+                                                        '.',
+                                                        ''
+                                                    )
+                                                    : ''
+                                            }}"
+                                            placeholder="kg"
+                                            required
+                                        >
+
+                                        <button
+                                            type="submit"
+                                            class="btn btn-outline-primary"
+                                            onclick="return confirm('Restock this product?')"
+                                        >
+                                            Restock
+                                        </button>
+
+                                    </div>
+
+                                </form>
+
+
+                                {{-- DELETE --}}
+                                <form
+                                    method="POST"
+                                    action="{{ route(
+                                        'farmer.products.delete',
+                                        $p->id
+                                    ) }}"
+                                >
+                                    @csrf
+
+                                    <button
+                                        type="submit"
+                                        class="btn btn-outline-danger btn-sm"
+                                        onclick="return confirm('Delete this product permanently?')"
+                                    >
+                                        Delete
+                                    </button>
+
+                                </form>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                @empty
+
+                    <tr>
+
+                        <td
+                            colspan="9"
+                            class="text-center py-5 text-muted"
+                        >
+
+                            <h5 class="mb-2">
+                                No products found
+                            </h5>
+
+                            <p class="mb-3">
+                                You haven't posted any rice
+                                or palay products yet.
+                            </p>
+
+                            <a
+                                href="{{ route('farmer.products.create') }}"
+                                class="btn btn-success"
+                            >
+                                + Post Your First Product
+                            </a>
+
+                        </td>
+
+                    </tr>
+
+                @endforelse
+
+                </tbody>
+
+            </table>
 
         </div>
-
-    </td>
-
-    <td>
-
-        <span class="badge bg-secondary">
-
-            {{ strtoupper($p->type ?? '-') }}
-
-        </span>
-
-    </td>
-
-    <td class="price">
-
-        ₱{{ number_format((float)($p->price_per_kg ?? 0),2) }}
-
-    </td>
-
-    <td class="stock">
-
-        {{ number_format((float)($p->kilos_available ?? 0),2) }} kg
-
-    </td>
-
-    <td>
-
-        @if($p->is_active)
-
-            <span class="badge bg-success">
-
-                ACTIVE
-
-            </span>
-
-        @else
-
-            <span class="badge bg-danger">
-
-                INACTIVE
-
-            </span>
-
-        @endif
-
-    </td>
-
-    <td>
-
-        {{ optional($p->created_at)->format('M d, Y') }}
-
-    </td>
-
-    <td>
-
-        <div class="action-buttons">
-
-            {{-- Toggle --}}
-
-            <form
-                method="POST"
-                action="{{ route('farmer.products.toggle',$p->id) }}">
-
-                @csrf
-
-                <button
-                    class="btn btn-outline-success btn-sm"
-                    onclick="return confirm('Toggle product status?')">
-
-                    Toggle
-
-                </button>
-
-            </form>
-
-            {{-- Out Of Stock --}}
-
-            <form
-                method="POST"
-                action="{{ route('farmer.products.outOfStock',$p->id) }}">
-
-                @csrf
-
-                <button
-                    class="btn btn-outline-danger btn-sm"
-                    onclick="return confirm('Mark as out of stock?')">
-
-                    Out of Stock
-
-                </button>
-
-            </form>
-
-            {{-- Restock --}}
-
-            <form
-                method="POST"
-                action="{{ route('farmer.products.restock',$p->id) }}">
-
-                @csrf
-
-                <div class="input-group input-group-sm restock-group">
-
-                    <input
-                        type="number"
-                        name="kilos_available"
-                        step="0.1"
-                        min="0.1"
-                        class="form-control"
-                        value="{{ $p->kilos_available > 0 ? number_format($p->kilos_available,2,'.','') : '' }}"
-                        placeholder="kg">
-
-                    <button
-                        class="btn btn-outline-primary"
-                        type="submit"
-                        onclick="return confirm('Restock this product?')">
-
-                        Restock
-
-                    </button>
-
-                </div>
-
-            </form>
-
-            {{-- Delete --}}
-
-            <form
-                method="POST"
-                action="{{ route('farmer.products.delete',$p->id) }}">
-
-                @csrf
-
-                <button
-                    class="btn btn-outline-danger btn-sm"
-                    onclick="return confirm('Delete this product permanently?')">
-
-                    Delete
-
-                </button>
-
-            </form>
-
-        </div>
-
-    </td>
-
-</tr>
-
-@empty
-
-<tr>
-
-    <td colspan="9" class="text-center py-5 text-muted">
-
-        <h5 class="mb-2">
-
-            No products found
-
-        </h5>
-
-        <p class="mb-3">
-
-            You haven't posted any rice or palay products yet.
-
-        </p>
-
-        <a
-            href="{{ route('farmer.products.create') }}"
-            class="btn btn-success">
-
-            + Post Your First Product
-
-        </a>
-
-    </td>
-
-</tr>
-
-@endforelse
-
-</tbody>
-
-</table>
-
-</div>
-
-<!-- =========================
-     MOBILE CARD LAYOUT
-========================= -->
-
-<div class="mobile-products">
-  @forelse($products as $p)
-
-<div class="mobile-card">
-
-    @if(!empty($p->photo_path))
-
-        <img
-            src="{{ asset('storage/'.$p->photo_path) }}"
-            class="mobile-image"
-            alt="{{ $p->name }}">
-
-    @else
-
-        <div
-            class="mobile-image d-flex align-items-center justify-content-center text-muted">
-
-            No Photo
-
-        </div>
-
-    @endif
-
-    <div class="mobile-content">
-
-        <div class="mobile-title">
-
-            {{ $p->name }}
-
-        </div>
-
-        <div class="mobile-info">
-
-            <div>
-
-                <div class="mobile-label">
-
-                    Type
-
-                </div>
-
-                <div class="mobile-value">
-
-                    {{ strtoupper($p->type ?? '-') }}
-
-                </div>
-
-            </div>
-
-            <div>
-
-                <div class="mobile-label">
-
-                    Price
-
-                </div>
-
-                <div class="mobile-value text-success">
-
-                    ₱{{ number_format((float)($p->price_per_kg ?? 0),2) }}/kg
-
-                </div>
-
-            </div>
-
-        </div>
-
-        <div class="mobile-info">
-
-            <div>
-
-                <div class="mobile-label">
-
-                    Stocks
-
-                </div>
-
-                <div class="mobile-value">
-
-                    {{ number_format((float)($p->kilos_available ?? 0),2) }} kg
-
-                </div>
-
-            </div>
-
-            <div>
-
-                <div class="mobile-label">
-
-                    Status
-
-                </div>
-
-                @if($p->is_active)
-
-                    <span class="badge bg-success">
-
-                        ACTIVE
-
-                    </span>
-
-                @else
-
-                    <span class="badge bg-danger">
-
-                        INACTIVE
-
-                    </span>
-
-                @endif
-
-            </div>
-
-        </div>
-
-        <div class="mobile-info">
-
-            <div>
-
-                <div class="mobile-label">
-
-                    Posted
-
-                </div>
-
-                <div class="mobile-value">
-
-                    {{ optional($p->created_at)->format('M d, Y') }}
-
-                </div>
-
-            </div>
-
-        </div>
-
-        <div class="mobile-actions">
-
-            {{-- Toggle --}}
-
-            <form
-                method="POST"
-                action="{{ route('farmer.products.toggle',$p->id) }}">
-
-                @csrf
-
-                <button
-                    class="btn btn-outline-success"
-                    onclick="return confirm('Toggle this product?')">
-
-                    Toggle
-
-                </button>
-
-            </form>
-
-            {{-- Out Of Stock --}}
-
-            <form
-                method="POST"
-                action="{{ route('farmer.products.outOfStock',$p->id) }}">
-
-                @csrf
-
-                <button
-                    class="btn btn-outline-danger"
-                    onclick="return confirm('Mark as out of stock?')">
-
-                    Out of Stock
-
-                </button>
-
-            </form>
-
-        </div>
-
-        <form
-            class="mt-3"
-            method="POST"
-            action="{{ route('farmer.products.restock',$p->id) }}">
-
-            @csrf
-
-            <label class="form-label fw-semibold">
-
-                Restock Quantity (kg)
-
-            </label>
-
-            <div class="input-group">
-
-                <input
-                    type="number"
-                    step="0.1"
-                    min="0.1"
-                    class="form-control"
-                    name="kilos_available"
-                    value="{{ $p->kilos_available > 0 ? number_format($p->kilos_available,2,'.','') : '' }}"
-                    placeholder="Enter kilos">
-
-                <button
-                    class="btn btn-primary"
-                    onclick="return confirm('Restock this product?')">
-
-                    Restock
-
-                </button>
-
-            </div>
-
-        </form>
-
-        <form
-            class="mt-3"
-            method="POST"
-            action="{{ route('farmer.products.delete',$p->id) }}">
-
-            @csrf
-
-            <button
-                class="btn btn-danger w-100"
-                onclick="return confirm('Delete this product permanently?')">
-
-                Delete Product
-
-            </button>
-
-        </form>
 
     </div>
 
-</div>
 
-@empty
+    {{-- =========================================
+         MOBILE PRODUCT CARDS
+    ========================================== --}}
+    <div class="mobile-products">
 
-<div class="text-center py-5">
+        @forelse($products as $p)
 
-    <h5 class="text-muted">
+            <article class="mobile-card">
 
-        No products found.
+                {{-- PRODUCT IMAGE --}}
+                @if(!empty($p->photo_path))
 
-    </h5>
+                    <img
+                        src="{{ asset('storage/'.$p->photo_path) }}"
+                        class="mobile-image"
+                        alt="{{ $p->name }}"
+                    >
 
-    <p class="text-muted">
+                @else
 
-        You haven't posted any rice or palay products yet.
+                    <div
+                        class="mobile-image d-flex align-items-center justify-content-center text-muted"
+                    >
+                        No Photo
+                    </div>
 
-    </p>
+                @endif
 
-    <a
-        href="{{ route('farmer.products.create') }}"
-        class="btn btn-success">
 
-        + Post Your First Product
+                <div class="mobile-content">
 
-    </a>
 
-</div>
+                    {{-- =================================
+                         PRODUCT NAME + STATUS
+                    ================================== --}}
+                    <div class="mobile-product-head">
 
-@endforelse
+                        <div class="mobile-title">
+                            {{ $p->name }}
+                        </div>
 
-</div>
 
-<div class="mt-4">
+                        <div class="mobile-status">
 
-    {{ $products->links() }}
+                            @if($p->is_active)
 
-</div>
+                                <span class="badge bg-success">
+                                    ACTIVE
+                                </span>
 
-</div>
+                            @else
 
-</div>
+                                <span class="badge bg-danger">
+                                    INACTIVE
+                                </span>
 
-</div>
+                            @endif
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+                        </div>
+
+                    </div>
+
+
+                    {{-- =================================
+                         PRODUCT INFORMATION
+                    ================================== --}}
+                    <div class="mobile-info-grid">
+
+
+                        {{-- TYPE --}}
+                        <div class="mobile-info-box">
+
+                            <span class="mobile-label">
+                                Type
+                            </span>
+
+                            <div class="mobile-value">
+                                {{ strtoupper($p->type ?? '-') }}
+                            </div>
+
+                        </div>
+
+
+                        {{-- PRICE --}}
+                        <div class="mobile-info-box">
+
+                            <span class="mobile-label">
+                                Price
+                            </span>
+
+                            <div class="mobile-value price-value">
+
+                                ₱{{ number_format(
+                                    (float)($p->price_per_kg ?? 0),
+                                    2
+                                ) }}/kg
+
+                            </div>
+
+                        </div>
+
+
+                        {{-- STOCK --}}
+                        <div class="mobile-info-box">
+
+                            <span class="mobile-label">
+                                Stock
+                            </span>
+
+                            <div class="mobile-value">
+
+                                {{ number_format(
+                                    (float)($p->kilos_available ?? 0),
+                                    2
+                                ) }} kg
+
+                            </div>
+
+                        </div>
+
+
+                        {{-- DATE --}}
+                        <div class="mobile-info-box">
+
+                            <span class="mobile-label">
+                                Posted
+                            </span>
+
+                            <div class="mobile-value">
+
+                                {{ optional($p->created_at)
+                                    ->format('M d, Y') }}
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    {{-- =================================
+                         STATUS ACTIONS
+                    ================================== --}}
+                    <div class="mobile-actions">
+
+
+                        {{-- TOGGLE --}}
+                        <form
+                            method="POST"
+                            action="{{ route(
+                                'farmer.products.toggle',
+                                $p->id
+                            ) }}"
+                        >
+                            @csrf
+
+                            <button
+                                type="submit"
+                                class="btn btn-outline-success"
+                                onclick="return confirm('Toggle this product?')"
+                            >
+                                Toggle
+                            </button>
+
+                        </form>
+
+
+                        {{-- OUT OF STOCK --}}
+                        <form
+                            method="POST"
+                            action="{{ route(
+                                'farmer.products.outOfStock',
+                                $p->id
+                            ) }}"
+                        >
+                            @csrf
+
+                            <button
+                                type="submit"
+                                class="btn btn-outline-danger"
+                                onclick="return confirm('Mark as out of stock?')"
+                            >
+                                Out of Stock
+                            </button>
+
+                        </form>
+
+                    </div>
+
+
+                    {{-- =================================
+                         RESTOCK
+                    ================================== --}}
+                    <div class="mobile-restock">
+
+                        <form
+                            method="POST"
+                            action="{{ route(
+                                'farmer.products.restock',
+                                $p->id
+                            ) }}"
+                        >
+                            @csrf
+
+                            <label class="mobile-restock-label">
+                                Restock Quantity (kg)
+                            </label>
+
+
+                            <div class="input-group">
+
+                                <input
+                                    type="number"
+                                    step="0.1"
+                                    min="0.1"
+                                    class="form-control"
+                                    name="kilos_available"
+                                    value="{{
+                                        $p->kilos_available > 0
+                                            ? number_format(
+                                                $p->kilos_available,
+                                                2,
+                                                '.',
+                                                ''
+                                            )
+                                            : ''
+                                    }}"
+                                    placeholder="Enter kilos"
+                                    required
+                                >
+
+                                <button
+                                    type="submit"
+                                    class="btn btn-primary"
+                                    onclick="return confirm('Restock this product?')"
+                                >
+                                    Restock
+                                </button>
+
+                            </div>
+
+                        </form>
+
+                    </div>
+
+
+                    {{-- =================================
+                         DELETE
+                    ================================== --}}
+                    <form
+                        class="delete-form"
+                        method="POST"
+                        action="{{ route(
+                            'farmer.products.delete',
+                            $p->id
+                        ) }}"
+                    >
+                        @csrf
+
+                        <button
+                            type="submit"
+                            class="btn btn-danger delete-btn"
+                            onclick="return confirm('Delete this product permanently?')"
+                        >
+                            Delete Product
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </article>
+
+        @empty
+
+            <div class="empty-state">
+
+                <h5>
+                    No products found.
+                </h5>
+
+                <p>
+                    You haven't posted any rice or
+                    palay products yet.
+                </p>
+
+                <a
+                    href="{{ route('farmer.products.create') }}"
+                    class="btn btn-success"
+                >
+                    + Post Your First Product
+                </a>
+
+            </div>
+
+        @endforelse
+
+    </div>
+
+
+    {{-- =========================================
+         PAGINATION
+    ========================================== --}}
+    @if(method_exists($products, 'links'))
+
+        <div class="pagination-wrap">
+
+            {{ $products->links() }}
+
+        </div>
+
+    @endif
+
+</main>
+
+
+<script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js">
+</script>
 
 </body>
 </html>

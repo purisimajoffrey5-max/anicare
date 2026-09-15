@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Order;
 use App\Models\RiceProduct;
+use App\Services\VatService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
 
@@ -115,6 +116,15 @@ class OrderInvoiceService
 
         /*
         |--------------------------------------------------------------------------
+        | VAT SNAPSHOT
+        |--------------------------------------------------------------------------
+        | Read the current Admin VAT setting server-side. The VAT is inclusive,
+        | so the charged grand total remains the same.
+        */
+        $vat = VatService::breakdown($grandTotal);
+
+        /*
+        |--------------------------------------------------------------------------
         | INVOICE NUMBER
         |--------------------------------------------------------------------------
         */
@@ -209,6 +219,11 @@ class OrderInvoiceService
             'subtotal' => round($subtotal, 2),
             'shipping_fee' => round($shippingFee, 2),
             'grand_total' => round($grandTotal, 2),
+            'vat_enabled' => $vat['enabled'],
+            'vat_rate' => $vat['rate'],
+            'vatable_sales' => $vat['vatable_sales'],
+            'vat_amount' => $vat['vat'],
+            'total_sales' => $vat['total_sales'],
             'distance_km' => round($distanceKm, 2),
 
             'buyer_name_snapshot' => $buyerName,

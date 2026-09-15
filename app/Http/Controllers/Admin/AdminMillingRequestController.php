@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use App\Services\VatService;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\ValidationException;
@@ -96,13 +97,18 @@ class AdminMillingRequestController extends Controller
                 $adminAddress
             );
 
+        $vatEnabled = VatService::enabled();
+        $vatRate = VatService::rate();
+
         return view(
             'admin.milling.create',
             compact(
                 'user',
                 'millers',
                 'adminAddress',
-                'adminCoordinates'
+                'adminCoordinates',
+                'vatEnabled',
+                'vatRate'
             )
         );
     }
@@ -469,6 +475,8 @@ class AdminMillingRequestController extends Controller
                 2
             );
 
+        $vat = VatService::breakdown($grandTotal);
+
 
         try {
 
@@ -491,7 +499,8 @@ class AdminMillingRequestController extends Controller
                     $shippingFee,
                     $millingFeePerKg,
                     $millingTotal,
-                    $grandTotal
+                    $grandTotal,
+                    $vat
                 ) {
 
                     $payload = [];
@@ -687,6 +696,12 @@ class AdminMillingRequestController extends Controller
                         'grand_total',
                         $grandTotal
                     );
+
+                    $this->putIfColumnExists($payload, 'vat_enabled', $vat['enabled']);
+                    $this->putIfColumnExists($payload, 'vat_rate', $vat['rate']);
+                    $this->putIfColumnExists($payload, 'vatable_sales', $vat['vatable_sales']);
+                    $this->putIfColumnExists($payload, 'vat_amount', $vat['vat']);
+                    $this->putIfColumnExists($payload, 'total_sales', $vat['total_sales']);
 
 
                     /*

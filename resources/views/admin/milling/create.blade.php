@@ -92,6 +92,13 @@
             .selected-box .btn{width:100%}
             .quantity-grid,.transport-grid{grid-template-columns:1fr}
         }
+    
+        .vat-summary-row {
+            background: #f8faf9;
+            border-radius: 6px;
+            padding: 7px 9px;
+            margin-top: 4px;
+        }
     </style>
 </head>
 
@@ -398,6 +405,21 @@
                     <strong id="shippingFeeDisplay">FREE</strong>
                 </div>
 
+                @if($vatEnabled)
+                    <div class="cost-row vat-summary-row">
+                        <span>VATable Sales</span>
+                        <strong id="vatableSalesDisplay">₱0.00</strong>
+                    </div>
+                    <div class="cost-row vat-summary-row">
+                        <span>VAT ({{ number_format((float)$vatRate, 2) }}%)</span>
+                        <strong id="vatAmountDisplay">₱0.00</strong>
+                    </div>
+                    <div class="cost-row vat-summary-row">
+                        <span>Total Sales (VAT Inclusive)</span>
+                        <strong id="totalSalesDisplay">₱0.00</strong>
+                    </div>
+                @endif
+
                 <div class="cost-row cost-grand">
                     <span>Estimated Grand Total</span>
                     <span id="grandTotalDisplay">₱0.00</span>
@@ -552,6 +574,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const SACK_KILOS = 60;
     const MILLING_RATE = 2.50;
+    const VAT_ENABLED = @json($vatEnabled);
+    const VAT_RATE = @json((float) $vatRate) / 100;
     const SHIPPING_BASE = 50;
     const SHIPPING_PER_KM = 10;
 
@@ -889,6 +913,10 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
 
+    const vatableSalesDisplay = document.getElementById('vatableSalesDisplay');
+    const vatAmountDisplay = document.getElementById('vatAmountDisplay');
+    const totalSalesDisplay = document.getElementById('totalSalesDisplay');
+
     function updateCost() {
 
         const kilos =
@@ -949,6 +977,14 @@ document.addEventListener('DOMContentLoaded', function () {
         const grandTotal =
             millingFee +
             shippingFee;
+
+        if (VAT_ENABLED && vatableSalesDisplay && vatAmountDisplay && totalSalesDisplay) {
+            const vatableSales = Math.round((grandTotal / (1 + VAT_RATE)) * 100) / 100;
+            const vatAmount = Math.round((grandTotal - vatableSales) * 100) / 100;
+            vatableSalesDisplay.textContent = money(vatableSales);
+            vatAmountDisplay.textContent = money(vatAmount);
+            totalSalesDisplay.textContent = money(grandTotal);
+        }
 
 
         document
