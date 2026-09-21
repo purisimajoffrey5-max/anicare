@@ -327,11 +327,19 @@
           'class' => '',
         ],
         [
-          'route' => 'admin.reports.vat.settings',
-          'icon' => 'bi-percent',
-          'title' => 'Central VAT Setting',
-          'text' => 'Configure VAT rate and enable or disable VAT',
+          'route' => 'admin.settings',
+          'icon' => 'bi-gear-fill',
+          'title' => 'System Settings',
+          'text' => 'Manage central system configuration for ANI-CARE',
           'button' => 'Open Settings',
+          'class' => '',
+        ],
+        [
+          'route' => 'help.index',
+          'icon' => 'bi-life-preserver',
+          'title' => 'Help Center',
+          'text' => 'Learn how to operate ANI-CARE and ask the assistant',
+          'button' => 'Get Help',
           'class' => '',
         ],
         [
@@ -487,6 +495,9 @@
   </section>
 
 </main>
+
+<?php echo $__env->make('components.help-center', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>

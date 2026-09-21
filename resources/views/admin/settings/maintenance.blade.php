@@ -1,9 +1,11 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <title>Central VAT Setting | ANI-CARE</title>
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Maintenance Mode | ANI-CARE</title>
 
     <link
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
@@ -141,8 +143,8 @@
             place-items: center;
 
             border-radius: 12px;
-            background: #eaf7f0;
-            color: #198754;
+            background: #fff5d6;
+            color: #b58105;
 
             font-size: 21px;
         }
@@ -165,7 +167,7 @@
         }
 
         /* =========================
-           STATUS
+           CURRENT STATUS
         ========================= */
 
         .status-box {
@@ -196,8 +198,8 @@
 
         .status-badge {
             white-space: nowrap;
-            font-size: 11px;
-            font-weight: 600;
+            font-size: 10px;
+            font-weight: 700;
             border-radius: 20px;
             padding: 6px 10px;
         }
@@ -208,50 +210,31 @@
 
         .section-label {
             display: block;
-            margin-bottom: 7px;
+            margin-bottom: 8px;
             color: #343a40;
             font-size: 12px;
             font-weight: 700;
         }
 
-        .vat-input-group {
-            display: flex;
+        .maintenance-message {
             width: 100%;
-        }
+            min-height: 120px;
 
-        .vat-input {
-            height: 44px;
             border: 1px solid #ced4da;
-            border-right: none;
-            border-radius: 7px 0 0 7px;
+            border-radius: 7px;
 
-            padding: 8px 12px;
+            padding: 11px 12px;
 
-            font-size: 14px;
+            font-size: 13px;
+            line-height: 1.5;
+
+            resize: vertical;
             outline: none;
-            flex: 1;
         }
 
-        .vat-input:focus {
+        .maintenance-message:focus {
             border-color: #198754;
             box-shadow: 0 0 0 3px rgba(25, 135, 84, .10);
-        }
-
-        .percent-box {
-            min-width: 48px;
-            height: 44px;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            background: #f1f3f5;
-            border: 1px solid #ced4da;
-            border-radius: 0 7px 7px 0;
-
-            color: #495057;
-            font-size: 13px;
-            font-weight: 600;
         }
 
         .form-help {
@@ -261,10 +244,10 @@
         }
 
         /* =========================
-           VAT STATUS BUTTONS
+           MAINTENANCE OPTIONS
         ========================= */
 
-        .vat-status-section {
+        .maintenance-section {
             margin-top: 23px;
         }
 
@@ -285,7 +268,7 @@
         }
 
         .status-option label {
-            min-width: 125px;
+            min-width: 145px;
             padding: 9px 13px;
 
             display: inline-flex;
@@ -306,31 +289,45 @@
             transition: .15s ease;
         }
 
-        .status-option input:checked + label {
-            background: #198754;
-            border-color: #198754;
-            color: #fff;
-        }
-
         .status-option label:hover {
             border-color: #198754;
             color: #198754;
         }
 
-        .status-option input:checked + label:hover {
+        /* ACTIVE MAINTENANCE */
+
+        .maintenance-option input:checked + label {
+            background: #dc3545;
+            border-color: #dc3545;
+            color: #fff;
+        }
+
+        .maintenance-option input:checked + label:hover {
+            color: #fff;
+        }
+
+        /* ACTIVE AVAILABLE */
+
+        .available-option input:checked + label {
+            background: #198754;
+            border-color: #198754;
+            color: #fff;
+        }
+
+        .available-option input:checked + label:hover {
             color: #fff;
         }
 
         /* =========================
-           INFO BOX
+           INFORMATION BOX
         ========================= */
 
         .info-box {
             margin-top: 22px;
             padding: 12px 14px;
 
-            background: #f8faf9;
-            border-left: 3px solid #198754;
+            background: #fff8e1;
+            border-left: 3px solid #ffc107;
             border-radius: 6px;
 
             color: #6c757d;
@@ -339,11 +336,11 @@
         }
 
         .info-box strong {
-            color: #198754;
+            color: #856404;
         }
 
         /* =========================
-           FOOTER BUTTONS
+           FORM ACTIONS
         ========================= */
 
         .form-actions {
@@ -417,6 +414,15 @@
                 flex-direction: column;
             }
 
+            .status-options {
+                flex-direction: column;
+            }
+
+            .status-option,
+            .status-option label {
+                width: 100%;
+            }
+
             .form-actions {
                 flex-direction: column-reverse;
             }
@@ -430,9 +436,11 @@
     </style>
 </head>
 
+
 <body>
 
 <header class="topbar">
+
     <div class="topbar-inner">
 
         <div class="brand">
@@ -440,74 +448,82 @@
             ANI-CARE | LGU
         </div>
 
-        <a href="<?php echo e(route('admin.dashboard')); ?>" class="back-btn">
+        <a
+            href="{{ route('admin.settings') }}"
+            class="back-btn"
+        >
             <i class="bi bi-arrow-left me-1"></i>
-            Back to Dashboard
+            Back to Settings
         </a>
 
     </div>
+
 </header>
 
 
 <main class="page-wrap">
 
-    
+    {{-- PAGE TITLE --}}
     <div class="page-heading">
-        <h2>Central VAT Setting</h2>
+
+        <h2>
+            Maintenance Mode
+        </h2>
 
         <p>
-            Manage the VAT rate and enable or disable VAT for applicable transactions.
+            Temporarily restrict non-admin access while system updates or maintenance are being performed.
         </p>
+
     </div>
 
 
-    
-    <?php if(session('success')): ?>
-        <div class="alert alert-success">
-            <i class="bi bi-check-circle-fill me-1"></i>
-            <?php echo e(session('success')); ?>
+    {{-- VALIDATION ERRORS --}}
+    @if($errors->any())
 
-        </div>
-    <?php endif; ?>
-
-
-    
-    <?php if($errors->any()): ?>
         <div class="alert alert-danger">
+
             <strong>
                 <i class="bi bi-exclamation-triangle-fill me-1"></i>
                 Please check the following:
             </strong>
 
             <ul class="mb-0 mt-2">
-                <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                    <li><?php echo e($error); ?></li>
-                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+
+                @foreach($errors->all() as $error)
+
+                    <li>{{ $error }}</li>
+
+                @endforeach
+
             </ul>
+
         </div>
-    <?php endif; ?>
+
+    @endif
 
 
-    
+    {{-- SETTINGS CARD --}}
     <div class="settings-card">
 
-        
+        {{-- HEADER --}}
         <div class="card-header-custom">
 
             <div class="header-row">
 
                 <div class="module-icon">
-                    <i class="bi bi-percent"></i>
+                    <i class="bi bi-tools"></i>
                 </div>
 
                 <div>
+
                     <h5 class="card-title">
-                        VAT Configuration
+                        Maintenance Configuration
                     </h5>
 
                     <div class="card-description">
-                        Configure the central VAT setting used by ANI-CARE transactions.
+                        Control whether Resident, Farmer, and Miller accounts can access ANI-CARE.
                     </div>
+
                 </div>
 
             </div>
@@ -515,134 +531,111 @@
         </div>
 
 
-        
+        {{-- BODY --}}
         <div class="card-body-custom">
 
-            
+            {{-- CURRENT STATUS --}}
             <div class="status-box">
 
                 <div>
+
                     <div class="status-label">
-                        Current VAT Status
+                        Current System Status
                     </div>
 
                     <div class="status-description">
-                        <?php echo e($vatEnabled
-                            ? 'VAT is currently applied to applicable transactions.'
-                            : 'VAT is currently not applied to transactions.'); ?>
+
+                        @if($maintenanceEnabled)
+
+                            Non-admin accounts are currently blocked by the maintenance page.
+
+                        @else
+
+                            Resident, Farmer, and Miller accounts can access ANI-CARE normally.
+
+                        @endif
 
                     </div>
+
                 </div>
 
 
-                <?php if($vatEnabled): ?>
+                @if($maintenanceEnabled)
+
+                    <span class="badge bg-danger status-badge">
+                        <i class="bi bi-tools me-1"></i>
+                        UNDER MAINTENANCE
+                    </span>
+
+                @else
 
                     <span class="badge bg-success status-badge">
                         <i class="bi bi-check-circle me-1"></i>
-                        Enabled
+                        SYSTEM AVAILABLE
                     </span>
 
-                <?php else: ?>
-
-                    <span class="badge bg-secondary status-badge">
-                        <i class="bi bi-x-circle me-1"></i>
-                        Disabled
-                    </span>
-
-                <?php endif; ?>
+                @endif
 
             </div>
 
 
-            
+            {{-- FORM --}}
             <form
                 method="POST"
-                action="<?php echo e(route('admin.reports.vat.update')); ?>"
+                action="{{ route('admin.settings.maintenance.update') }}"
             >
 
-                <?php echo csrf_field(); ?>
+                @csrf
 
 
-                
-                <div>
-
-                    <label class="section-label">
-                        VAT Rate
-                    </label>
-
-                    <div class="vat-input-group">
-
-                        <input
-                            type="number"
-                            name="vat_rate"
-                            class="vat-input"
-                            min="0"
-                            max="100"
-                            step="0.01"
-                            value="<?php echo e(number_format($vatRate, 2, '.', '')); ?>"
-                            required
-                        >
-
-                        <div class="percent-box">
-                            %
-                        </div>
-
-                    </div>
-
-                    <div class="form-help">
-                        Example:
-                        <strong>0.30</strong> = 0.3% VAT
-                        &nbsp; | &nbsp;
-                        <strong>12.00</strong> = 12% VAT
-                    </div>
-
-                </div>
-
-
-                
-                <div class="vat-status-section">
+                {{-- MAINTENANCE STATUS --}}
+                <div class="maintenance-section">
 
                     <label class="section-label">
-                        VAT Status
+                        Maintenance Status
                     </label>
 
                     <div class="status-options">
 
-                        
-                        <div class="status-option">
+                        {{-- UNDER MAINTENANCE --}}
+                        <div class="status-option maintenance-option">
 
                             <input
                                 type="radio"
-                                id="vat_enable"
-                                name="vat_enabled"
+                                id="maintenance_enabled"
+                                name="maintenance_enabled"
                                 value="1"
-                                <?php echo e($vatEnabled ? 'checked' : ''); ?>
-
+                                {{ $maintenanceEnabled ? 'checked' : '' }}
                             >
 
-                            <label for="vat_enable">
-                                <i class="bi bi-check-circle"></i>
-                                Enable VAT
+                            <label for="maintenance_enabled">
+
+                                <i class="bi bi-tools"></i>
+
+                                Under Maintenance
+
                             </label>
 
                         </div>
 
 
-                        
-                        <div class="status-option">
+                        {{-- SYSTEM AVAILABLE --}}
+                        <div class="status-option available-option">
 
                             <input
                                 type="radio"
-                                id="vat_disable"
-                                name="vat_enabled"
+                                id="maintenance_disabled"
+                                name="maintenance_enabled"
                                 value="0"
-                                <?php echo e(!$vatEnabled ? 'checked' : ''); ?>
-
+                                {{ !$maintenanceEnabled ? 'checked' : '' }}
                             >
 
-                            <label for="vat_disable">
-                                <i class="bi bi-x-circle"></i>
-                                Disable VAT
+                            <label for="maintenance_disabled">
+
+                                <i class="bi bi-check-circle"></i>
+
+                                System Available
+
                             </label>
 
                         </div>
@@ -652,23 +645,54 @@
                 </div>
 
 
-                
-                <div class="info-box">
+                {{-- MAINTENANCE MESSAGE --}}
+                <div class="mt-4">
 
-                    <i class="bi bi-info-circle me-1"></i>
+                    <label
+                        for="maintenance_message"
+                        class="section-label"
+                    >
+                        Maintenance Message
+                    </label>
 
-                    <strong>Central Setting:</strong>
-                    Changes made here will be used by the system wherever
-                    the central VAT configuration is applied.
+                    <textarea
+                        id="maintenance_message"
+                        name="maintenance_message"
+                        rows="5"
+                        maxlength="500"
+                        class="maintenance-message"
+                        required
+                    >{{ old('maintenance_message', $maintenanceMessage) }}</textarea>
+
+                    <div class="form-help">
+
+                        This message will be shown to Resident, Farmer,
+                        and Miller users while Maintenance Mode is enabled.
+
+                    </div>
 
                 </div>
 
 
-                
+                {{-- INFORMATION --}}
+                <div class="info-box">
+
+                    <i class="bi bi-info-circle me-1"></i>
+
+                    <strong>Administrator Access:</strong>
+
+                    Admin accounts remain accessible during Maintenance Mode
+                    so the administrator can return here and select
+                    <strong>System Available</strong> when maintenance is finished.
+
+                </div>
+
+
+                {{-- ACTION BUTTONS --}}
                 <div class="form-actions">
 
                     <a
-                        href="<?php echo e(route('admin.dashboard')); ?>"
+                        href="{{ route('admin.settings') }}"
                         class="btn-cancel"
                     >
                         Cancel
@@ -679,7 +703,7 @@
                         class="btn-save"
                     >
                         <i class="bi bi-save me-1"></i>
-                        Save VAT Setting
+                        Save Maintenance Setting
                     </button>
 
                 </div>
@@ -693,4 +717,4 @@
 </main>
 
 </body>
-</html><?php /**PATH C:\xampp\htdocs\Allacapan_Anicare\resources\views/admin/vat-settings.blade.php ENDPATH**/ ?>
+</html>

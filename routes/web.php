@@ -15,6 +15,8 @@ use App\Http\Controllers\Admin\AdminDistributionController;
 use App\Http\Controllers\Admin\AdminMillingRequestController;
 use App\Http\Controllers\Admin\AdminReportController;
 use App\Http\Controllers\Admin\VatSettingsController;
+use App\Http\Controllers\Admin\SystemSettingsController;
+use App\Http\Controllers\Admin\MaintenanceController;
 
 use App\Http\Controllers\Farmer\DashboardController as FarmerDashboardController;
 use App\Http\Controllers\Farmer\FarmProfileController;
@@ -42,6 +44,7 @@ use App\Http\Controllers\LocationController;
 
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\HelpCenterController;
 
 
 /*
@@ -58,11 +61,12 @@ Route::get('/', [PagesController::class, 'welcome'])
 |--------------------------------------------------------------------------
 | AUTH
 |--------------------------------------------------------------------------
-*/
-
-/*
-|--------------------------------------------------------------------------
-| LOGIN
+|
+| IMPORTANT:
+| DO NOT put the maintenance middleware here.
+|
+| This allows Admin to reach /login even when maintenance mode is ON.
+|
 |--------------------------------------------------------------------------
 */
 
@@ -98,7 +102,6 @@ Route::get(
     [AuthController::class, 'showRegisterOtpForm']
 )->name('register.otp.form');
 
-
 Route::post(
     '/register/verify-otp',
     [AuthController::class, 'verifyRegisterOtp']
@@ -131,21 +134,29 @@ Route::post('/logout', [AuthController::class, 'logout'])
 |--------------------------------------------------------------------------
 | DASHBOARD REDIRECT
 |--------------------------------------------------------------------------
+|
+| This route itself remains accessible after login.
+| The role-specific dashboard will be protected by maintenance middleware.
+|
+|--------------------------------------------------------------------------
 */
 
 Route::get('/dashboard', [AuthController::class, 'redirectDashboard'])
     ->name('dashboard.redirect');
+
 
 /*
 |--------------------------------------------------------------------------
 | GLOBAL IN-APP NOTIFICATIONS
 |--------------------------------------------------------------------------
 |
-| Shared by Admin, Farmer, Miller, and Resident notification bells.
+| Admin is automatically allowed through CheckMaintenanceMode.
+| Non-admin users are blocked when maintenance mode is enabled.
 |
+|--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'maintenance'])->group(function () {
 
     Route::get(
         '/notifications',
@@ -165,10 +176,49 @@ Route::middleware(['auth'])->group(function () {
 });
 
 
+/*
+|--------------------------------------------------------------------------
+| HELP CENTER
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth', 'maintenance'])->group(function () {
+
+    Route::get(
+        '/help',
+        [HelpCenterController::class, 'index']
+    )->name('help.index');
+
+    Route::get(
+        '/help/{slug}',
+        [HelpCenterController::class, 'article']
+    )->name('help.article');
+
+    Route::post(
+        '/help/chat',
+        [HelpCenterController::class, 'chat']
+    )->name('help.chat');
+
+});
+
 
 /*
 |--------------------------------------------------------------------------
 | ADMIN
+|--------------------------------------------------------------------------
+|
+| IMPORTANT:
+| There is NO "maintenance" middleware here.
+|
+| The CheckMaintenanceMode middleware itself also allows admin users,
+| but we intentionally do not attach it to the Admin route group.
+|
+| Therefore Admin can always:
+| - Login
+| - Open Dashboard
+| - Open System Settings
+| - Disable Maintenance Mode
+|
 |--------------------------------------------------------------------------
 */
 
@@ -177,16 +227,67 @@ Route::middleware(['auth'])
     ->name('admin.')
     ->group(function () {
 
+        /*
+        |--------------------------------------------------------------------------
+        | ADMIN DASHBOARD
+        |--------------------------------------------------------------------------
+        */
+
         Route::get(
             '/dashboard',
             fn () => view('dashboards.admin')
         )->name('dashboard');
 
-        /* ADMIN REPORTS / CENTRAL VAT SETTING */
+
+        /*
+        |--------------------------------------------------------------------------
+        | SYSTEM SETTINGS
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get(
+            '/settings',
+            [SystemSettingsController::class, 'index']
+        )->middleware('role:admin')
+         ->name('settings');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | MAINTENANCE SETTINGS
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get(
+            '/settings/maintenance',
+            [MaintenanceController::class, 'edit']
+        )->middleware('role:admin')
+         ->name('settings.maintenance');
+
+        Route::post(
+            '/settings/maintenance',
+            [MaintenanceController::class, 'update']
+        )->middleware('role:admin')
+         ->name('settings.maintenance.update');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | ADMIN REPORTS
+        |--------------------------------------------------------------------------
+        */
+
         Route::get(
             '/reports',
             [AdminReportController::class, 'index']
         )->name('reports');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | CENTRAL VAT SETTING
+        |--------------------------------------------------------------------------
+        */
 
         Route::get(
             '/reports/vat',
@@ -198,6 +299,12 @@ Route::middleware(['auth'])
             [VatSettingsController::class, 'update']
         )->name('reports.vat.update');
 
+
+        /*
+        |--------------------------------------------------------------------------
+        | ADMIN OVERVIEW
+        |--------------------------------------------------------------------------
+        */
 
         Route::view(
             '/overview',
@@ -292,47 +399,43 @@ Route::middleware(['auth'])
             )->name('inventory.assign');
         });
 
+
+        /*
+        |--------------------------------------------------------------------------
+        | ADMIN ORDERS
+        |--------------------------------------------------------------------------
+        */
+
         Route::get(
-    '/orders',
-    [AdminOrderController::class, 'index']
-)->name('orders.index');
+            '/orders',
+            [AdminOrderController::class, 'index']
+        )->name('orders.index');
 
-Route::get(
-    '/orders/{id}',
-    [AdminOrderController::class, 'show']
-)->name('orders.show');
+        Route::get(
+            '/orders/{id}',
+            [AdminOrderController::class, 'show']
+        )->name('orders.show');
 
-Route::post(
-    '/orders/{id}/received',
-    [AdminOrderController::class, 'confirmReceived']
-)->name('orders.received');
+        Route::post(
+            '/orders/{id}/received',
+            [AdminOrderController::class, 'confirmReceived']
+        )->name('orders.received');
 
-Route::get(
-    '/orders/{order}/invoice',
-    [AdminOrderController::class, 'invoiceShow']
-)->name('orders.invoice.show');
+        Route::get(
+            '/orders/{order}/invoice',
+            [AdminOrderController::class, 'invoiceShow']
+        )->name('orders.invoice.show');
 
-Route::get(
-    '/orders/{order}/invoice/download',
-    [AdminOrderController::class, 'invoiceDownload']
-)->name('orders.invoice.download');
+        Route::get(
+            '/orders/{order}/invoice/download',
+            [AdminOrderController::class, 'invoiceDownload']
+        )->name('orders.invoice.download');
 
 
         /*
         |--------------------------------------------------------------------------
-        | ADMIN MILLING TRANSACTIONS
+        | ADMIN MILLING REQUEST
         |--------------------------------------------------------------------------
-        |
-        | Admin can act as the requester:
-        |
-        | PENDING
-        |   -> Miller ACCEPTS
-        |   -> SCHEDULED + milling fee
-        |   -> IN PROGRESS
-        |   -> FINISHED + proof
-        |   -> Admin confirms completion
-        |   -> COMPLETED
-        |
         */
 
         Route::get(
@@ -348,20 +451,8 @@ Route::get(
 
         /*
         |--------------------------------------------------------------------------
-        | SELECTED MILLER BARANGAY -> MAP LOCATION
+        | SELECTED MILLER LOCATION
         |--------------------------------------------------------------------------
-        |
-        | Used by the Admin Milling Request form.
-        | The selected Miller's users.barangay is geocoded and returned as
-        | latitude/longitude for the hidden Leaflet shipping calculation.
-        |
-        | IMPORTANT:
-        | This route is already inside prefix('admin') and name('admin.'),
-        | therefore the final URL/name become:
-        |
-        | URL  : /admin/milling/millers/{id}/location
-        | NAME : admin.milling.millerLocation
-        |
         */
 
         Route::get(
@@ -369,6 +460,12 @@ Route::get(
             [AdminMillingRequestController::class, 'millerLocation']
         )->name('milling.millerLocation');
 
+
+        /*
+        |--------------------------------------------------------------------------
+        | ADMIN MILLING REQUESTS
+        |--------------------------------------------------------------------------
+        */
 
         Route::get(
             '/milling/requests',
@@ -400,7 +497,8 @@ Route::get(
             [AdminMillingRequestController::class, 'invoiceDownload']
         )->name('milling.invoice.download');
 
-/*
+
+        /*
         |--------------------------------------------------------------------------
         | FARMERS / MILLERS
         |--------------------------------------------------------------------------
@@ -480,23 +578,6 @@ Route::get(
             [AdminAnnouncementController::class, 'destroy']
         )->name('announcements.delete');
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | ADMIN NOTIFICATIONS
-        |--------------------------------------------------------------------------
-        |
-        | Admin uses the GLOBAL notification routes declared near the top:
-        |
-        | notifications.index
-        | notifications.open
-        | notifications.readAll
-        |
-        | Do NOT add App\Http\Controllers\Admin\NotificationController here.
-        | The global NotificationController handles Admin, Farmer, Miller,
-        | and Resident notification navigation.
-        |
-        */
     });
 
 
@@ -504,18 +585,16 @@ Route::get(
 |--------------------------------------------------------------------------
 | FARMER
 |--------------------------------------------------------------------------
+|
+| Maintenance is applied to the entire Farmer area.
+|
+|--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth'])
+Route::middleware(['auth', 'maintenance'])
     ->prefix('farmer')
     ->name('farmer.')
     ->group(function () {
-
-        /*
-        |--------------------------------------------------------------------------
-        | DASHBOARD
-        |--------------------------------------------------------------------------
-        */
 
         Route::get(
             '/dashboard',
@@ -523,23 +602,11 @@ Route::middleware(['auth'])
         )->name('dashboard');
 
 
-        /*
-        |--------------------------------------------------------------------------
-        | EARNINGS & ANALYTICS
-        |--------------------------------------------------------------------------
-        */
-
         Route::get(
             '/earnings',
             [FarmerEarningsController::class, 'index']
         )->name('earnings.index');
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | PROFILE
-        |--------------------------------------------------------------------------
-        */
 
         Route::get(
             '/profile',
@@ -551,12 +618,6 @@ Route::middleware(['auth'])
             [FarmProfileController::class, 'update']
         )->name('profile.update');
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | FARM LOCATION
-        |--------------------------------------------------------------------------
-        */
 
         Route::post(
             '/location',
@@ -585,17 +646,11 @@ Route::middleware(['auth'])
             [MillingRequestController::class, 'index']
         )->name('milling.index');
 
+
         /*
         |--------------------------------------------------------------------------
-        | FARMER CONFIRMS MILLING COMPLETION
+        | FARMER CONFIRMS MILLING
         |--------------------------------------------------------------------------
-        |
-        | FINISHED + PAID + PROOF
-        |          ↓
-        | Farmer confirms
-        |          ↓
-        | COMPLETED
-        |
         */
 
         Route::post(
@@ -650,17 +705,6 @@ Route::middleware(['auth'])
         |--------------------------------------------------------------------------
         | FARMER ORDERS
         |--------------------------------------------------------------------------
-        |
-        | Workflow:
-        | PENDING
-        |   -> APPROVED
-        |   -> PAID (when payment is actually received)
-        |   -> SET EXPECTED DELIVERY DATE & TIME
-        |   -> DISPATCH NOW / OUT FOR DELIVERY
-        |   -> DELIVERED + proof photo
-        |   -> Buyer confirms "I Received My Order"
-        |   -> COMPLETED
-        |
         */
 
         Route::get(
@@ -693,13 +737,6 @@ Route::middleware(['auth'])
             [FarmerOrderController::class, 'markDelivered']
         )->name('orders.delivered');
 
-        /*
-         * Legacy route:
-         * The new Farmer OrderController no longer allows the farmer
-         * to finalize an order as COMPLETED. The buyer must confirm receipt.
-         * Keeping this route prevents old buttons/links from crashing
-         * while you finish updating the Blade files.
-         */
         Route::post(
             '/orders/{id}/complete',
             [FarmerOrderController::class, 'complete']
@@ -709,6 +746,7 @@ Route::middleware(['auth'])
             '/orders/{id}/cancel',
             [FarmerOrderController::class, 'cancel']
         )->name('orders.cancel');
+
     });
 
 
@@ -716,30 +754,22 @@ Route::middleware(['auth'])
 |--------------------------------------------------------------------------
 | MILLER
 |--------------------------------------------------------------------------
+|
+| Maintenance is applied to the entire Miller area.
+|
+|--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth'])
+Route::middleware(['auth', 'maintenance'])
     ->prefix('miller')
     ->name('miller.')
     ->group(function () {
-
-        /*
-        |--------------------------------------------------------------------------
-        | DASHBOARD
-        |--------------------------------------------------------------------------
-        */
 
         Route::get(
             '/dashboard',
             [MillerDashboardController::class, 'index']
         )->name('dashboard');
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | EARNINGS & ANALYTICS
-        |--------------------------------------------------------------------------
-        */
 
         Route::get(
             '/earnings',
@@ -754,18 +784,8 @@ Route::middleware(['auth'])
 
         /*
         |--------------------------------------------------------------------------
-        | REQUESTS - MILLING TRANSACTION WORKFLOW
+        | MILLER REQUESTS
         |--------------------------------------------------------------------------
-        |
-        | PENDING
-        |   -> ACCEPTED
-        |   -> SCHEDULED + MILLING FEE
-        |   -> PAID (separate payment status)
-        |   -> IN PROGRESS
-        |   -> FINISHED + PROOF
-        |   -> REQUESTER CONFIRMS
-        |   -> COMPLETED
-        |
         */
 
         Route::get(
@@ -773,10 +793,6 @@ Route::middleware(['auth'])
             [MillerRequestController::class, 'index']
         )->name('requests');
 
-        /*
-         * Legacy approve route.
-         * The new controller forwards approve() to accept().
-         */
         Route::post(
             '/requests/{id}/approve',
             [MillerRequestController::class, 'approve']
@@ -812,11 +828,6 @@ Route::middleware(['auth'])
             [MillerRequestController::class, 'finishMilling']
         )->name('requests.finish');
 
-        /*
-         * Legacy complete route.
-         * Miller no longer finalizes COMPLETED.
-         * Farmer/Admin requester must confirm the finished transaction.
-         */
         Route::post(
             '/requests/{id}/complete',
             [MillerRequestController::class, 'complete']
@@ -884,6 +895,7 @@ Route::middleware(['auth'])
             '/location',
             [LocationController::class, 'saveMiller']
         )->name('location.save');
+
     });
 
 
@@ -891,18 +903,16 @@ Route::middleware(['auth'])
 |--------------------------------------------------------------------------
 | RESIDENT
 |--------------------------------------------------------------------------
+|
+| Maintenance is applied to the entire Resident area.
+|
+|--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth'])
+Route::middleware(['auth', 'maintenance'])
     ->prefix('resident')
     ->name('resident.')
     ->group(function () {
-
-        /*
-        |--------------------------------------------------------------------------
-        | DASHBOARD
-        |--------------------------------------------------------------------------
-        */
 
         Route::get(
             '/dashboard',
@@ -965,6 +975,7 @@ Route::middleware(['auth'])
             [ResidentOrderController::class, 'placeOrder']
         )->name('checkout.place');
 
+
         /*
         |--------------------------------------------------------------------------
         | ORDER INVOICE
@@ -1026,12 +1037,18 @@ Route::middleware(['auth'])
             '/product/{id}',
             [ResidentMarketplaceController::class, 'show']
         )->name('product.show');
+
     });
 
 
 /*
 |--------------------------------------------------------------------------
 | FORGOT PASSWORD
+|--------------------------------------------------------------------------
+|
+| These must remain accessible even during maintenance so users can
+| recover their accounts.
+|
 |--------------------------------------------------------------------------
 */
 
@@ -1040,30 +1057,25 @@ Route::get(
     [ForgotPasswordController::class, 'showEmailForm']
 )->name('forgot.password');
 
-
 Route::post(
     '/forgot-password',
     [ForgotPasswordController::class, 'sendOtp']
 )->name('forgot.password.send');
-
 
 Route::get(
     '/verify-otp',
     [ForgotPasswordController::class, 'showOtpForm']
 )->name('otp.form');
 
-
 Route::post(
     '/verify-otp',
     [ForgotPasswordController::class, 'verifyOtp']
 )->name('otp.verify');
 
-
 Route::get(
     '/reset-password',
     [ForgotPasswordController::class, 'showResetForm']
 )->name('password.reset.form');
-
 
 Route::post(
     '/reset-password',
