@@ -232,6 +232,16 @@
     distribution, payment, and delivery transactions.
   </div>
 
+  @if(Auth::user()?->role === 'super_admin')
+    <div class="alert alert-dark d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <strong><i class="bi bi-shield-lock-fill me-1"></i> Super Admin Control Center</strong>
+        <div class="small">Recovery, backup and security audit tools are available.</div>
+      </div>
+      <a href="{{ route('super-admin.dashboard') }}" class="btn btn-warning btn-sm">Open Super Admin</a>
+    </div>
+  @endif
+
   {{-- QUICK CARDS --}}
   <div class="row g-3 mb-4">
 

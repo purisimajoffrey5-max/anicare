@@ -56,7 +56,7 @@ class CheckMaintenanceMode
 
         if (
             Auth::check() &&
-            strtolower((string) Auth::user()->role) === 'admin'
+            in_array(strtolower((string) Auth::user()->role), ['admin', 'super_admin'], true)
         ) {
             return $next($request);
         }

@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\PagesController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\SuperAdminController;
 
 use App\Http\Controllers\AdminApprovalsController;
 use App\Http\Controllers\AdminFarmersMillersController;
@@ -222,7 +223,31 @@ Route::middleware(['auth', 'maintenance'])->group(function () {
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth'])
+
+/*
+|--------------------------------------------------------------------------
+| SUPER ADMIN - SYSTEM RECOVERY & CONTROL CENTER
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'role:super_admin'])
+    ->prefix('super-admin')
+    ->name('super-admin.')
+    ->group(function () {
+        Route::get('/dashboard', [SuperAdminController::class, 'dashboard'])
+            ->name('dashboard');
+
+        Route::get('/backup', [SuperAdminController::class, 'backup'])
+            ->name('backup');
+
+        Route::get('/restore', [SuperAdminController::class, 'restoreForm'])
+            ->name('restore');
+
+        Route::post('/restore', [SuperAdminController::class, 'restore'])
+            ->name('restore.execute');
+    });
+
+
+Route::middleware(['auth', 'role:admin,super_admin'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
@@ -248,7 +273,7 @@ Route::middleware(['auth'])
         Route::get(
             '/settings',
             [SystemSettingsController::class, 'index']
-        )->middleware('role:admin')
+        )->middleware('role:admin,super_admin')
          ->name('settings');
 
 
@@ -261,13 +286,13 @@ Route::middleware(['auth'])
         Route::get(
             '/settings/maintenance',
             [MaintenanceController::class, 'edit']
-        )->middleware('role:admin')
+        )->middleware('role:admin,super_admin')
          ->name('settings.maintenance');
 
         Route::post(
             '/settings/maintenance',
             [MaintenanceController::class, 'update']
-        )->middleware('role:admin')
+        )->middleware('role:admin,super_admin')
          ->name('settings.maintenance.update');
 
 

@@ -901,6 +901,10 @@ class AuthController extends Controller
                 redirect()
                     ->route('admin.dashboard'),
 
+            'super_admin' =>
+                redirect()
+                    ->route('super-admin.dashboard'),
+
             'farmer' =>
                 redirect()
                     ->route('farmer.dashboard'),
