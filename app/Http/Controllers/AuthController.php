@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Mail\OtpMail;
 use App\Models\User;
+use App\Models\SecurityEvent;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -802,6 +803,26 @@ class AuthController extends Controller
                 $user->password
             )
         ) {
+
+            // Record failed login for the Super Admin security monitor.
+            // Never store the submitted password.
+            try {
+                SecurityEvent::create([
+                    'user_id' => $user?->id,
+                    'event_type' => 'failed_login',
+                    'risk_level' => 'medium',
+                    'ip_address' => $request->ip(),
+                    'method' => $request->method(),
+                    'route' => $request->route()?->getName() ?? $request->path(),
+                    'user_agent' => $request->userAgent(),
+                    'description' => 'Failed login attempt for username: ' .
+                        $request->username,
+                ]);
+            } catch (\Throwable $e) {
+                // Security logging must not prevent the user from receiving
+                // the normal invalid-credentials response.
+                report($e);
+            }
 
             return back()
                 ->withErrors([
