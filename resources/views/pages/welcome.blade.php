@@ -39,6 +39,17 @@
         padding-right: 1rem !important;
     }
 
+    .terms-link {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.terms-link:hover {
+    color: #d1e7dd;
+    text-decoration: underline;
+}
+
 }
   </style>
 
@@ -330,8 +341,14 @@
         <div class="small mb-2">
             📍 Allacapan, Cagayan • ☎️ (Add contact number) • ✉️ (anicare.system@gmail.com)
         </div>
-        <small>© {{ date('Y') }} All Rights Reserved | Allacapan, Cagayan</small>
-    </div>
+        <div class="mt-2">
+    © 2026 All Rights Reserved |
+    Allacapan, Cagayan |
+    <a href="{{ route('terms') }}"
+       class="terms-link">
+        Terms and Conditions
+    </a>
+</div>
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>

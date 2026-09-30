@@ -56,6 +56,8 @@ use App\Http\Controllers\HelpCenterController;
 
 Route::get('/', [PagesController::class, 'welcome'])
     ->name('main');
+Route::view('/terms-and-conditions', 'terms-and-conditions')
+    ->name('terms');
 
 
 /*
