@@ -13,13 +13,14 @@ return new class extends Migration
 
             $table->unsignedBigInteger('user_id')->nullable();
 
-            $table->string('event_type');
-            $table->string('risk_level')->default('low');
+            // Keep indexed string lengths within MySQL's index limit.
+            $table->string('event_type', 191);
+            $table->string('risk_level', 50)->default('low');
 
             $table->string('ip_address', 45)->nullable();
             $table->string('method', 10)->nullable();
-            $table->string('route')->nullable();
-            $table->string('user_agent', 1000)->nullable();
+            $table->string('route', 191)->nullable();
+            $table->string('user_agent', 500)->nullable();
 
             $table->text('description')->nullable();
 
