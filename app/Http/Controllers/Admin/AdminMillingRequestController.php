@@ -36,9 +36,8 @@ class AdminMillingRequestController extends Controller
     private const DEFAULT_MILLING_FEE_PER_KG = 2.50;
 
     // Pickup shipping formula:
-    // PHP 50 base + PHP 10 per straight-line kilometer.
-    private const PICKUP_BASE_FEE = 50.00;
-    private const PICKUP_RATE_PER_KM = 10.00;
+    // PHP 5 per straight-line kilometer. No base shipping fee.
+    private const PICKUP_RATE_PER_KM = 5.00;
 
     /*
     |--------------------------------------------------------------------------
@@ -438,11 +437,7 @@ class AdminMillingRequestController extends Controller
 
             $shippingFee =
                 round(
-                    self::PICKUP_BASE_FEE +
-                    (
-                        $distanceKm *
-                        self::PICKUP_RATE_PER_KM
-                    ),
+                    $distanceKm * self::PICKUP_RATE_PER_KM,
                     2
                 );
         }

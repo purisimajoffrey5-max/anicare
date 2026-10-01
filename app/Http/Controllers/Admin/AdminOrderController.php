@@ -16,6 +16,8 @@ use Illuminate\Validation\ValidationException;
 
 class AdminOrderController extends Controller
 {
+    private const SHIPPING_RATE_PER_KM = 5.00;
+
     /*
     |--------------------------------------------------------------------------
     | REQUIRE ADMIN
@@ -1043,20 +1045,23 @@ class AdminOrderController extends Controller
                 |--------------------------------------------------------------------------
                 */
 
-                $shippingFee =
-                    $data['fulfillment_type'] === 'pickup'
-                        ? 0.0
-                        : max(
-                            0,
-                            (float) ($data['shipping_fee'] ?? 0)
-                        );
-
                 $distanceKm =
                     $data['fulfillment_type'] === 'pickup'
                         ? 0.0
                         : max(
                             0,
                             (float) ($data['distance_km'] ?? 0)
+                        );
+
+                // Delivery shipping is ₱5/km only.
+                // The server recalculates this value instead of trusting
+                // the browser-submitted shipping_fee.
+                $shippingFee =
+                    $data['fulfillment_type'] === 'pickup'
+                        ? 0.0
+                        : round(
+                            $distanceKm * self::SHIPPING_RATE_PER_KM,
+                            2
                         );
 
 

@@ -1296,13 +1296,12 @@ document.addEventListener('DOMContentLoaded', function () {
     | SHIPPING SETTINGS
     |--------------------------------------------------------------------------
     |
-    | ₱50 base fee
-    | + ₱10 per kilometer
+    | ₱5 per kilometer ONLY
+    | No base/fixed shipping fee
     |
     */
 
-    const BASE_SHIPPING_FEE = 50;
-    const SHIPPING_RATE_PER_KM = 10;
+    const SHIPPING_RATE_PER_KM = 5;
 
     /*
     | ₱100,000 and above = Check
@@ -1888,12 +1887,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
         currentShippingFee =
-            Math.ceil(
-                BASE_SHIPPING_FEE +
-                (
-                    currentDistance *
-                    SHIPPING_RATE_PER_KM
-                )
+            Number(
+                (currentDistance * SHIPPING_RATE_PER_KM).toFixed(2)
             );
 
 

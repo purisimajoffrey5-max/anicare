@@ -15,6 +15,10 @@ use Illuminate\Validation\ValidationException;
 class OrderController extends Controller
 {
     /**
+     * Delivery shipping rate. No fixed/base shipping fee is charged.
+     */
+    private const SHIPPING_RATE_PER_KM = 5.00;
+    /**
      * Make sure the logged-in user is a resident.
      */
     private function requireResident(): void
@@ -632,25 +636,27 @@ class OrderController extends Controller
                 |--------------------------------------------------------------------------
                 |
                 | Pickup = FREE SHIPPING
+                | Delivery = distance × PHP 5/km
+                | No fixed/base shipping fee is charged.
                 |
-                | Delivery uses the distance/shipping computed by the checkout.
-                | The invoice service records these values for transparency.
+                | The server recalculates the delivery shipping fee from distance_km
+                | instead of trusting the browser-submitted shipping_fee.
                 |
                 */
-                $shippingFee =
-                    $data['fulfillment_type'] === 'pickup'
-                        ? 0.0
-                        : max(
-                            0,
-                            (float) ($data['shipping_fee'] ?? 0)
-                        );
-
                 $distanceKm =
                     $data['fulfillment_type'] === 'pickup'
                         ? 0.0
                         : max(
                             0,
                             (float) ($data['distance_km'] ?? 0)
+                        );
+
+                $shippingFee =
+                    $data['fulfillment_type'] === 'pickup'
+                        ? 0.0
+                        : round(
+                            $distanceKm * self::SHIPPING_RATE_PER_KM,
+                            2
                         );
 
                 /*

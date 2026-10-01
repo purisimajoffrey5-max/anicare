@@ -2,16 +2,33 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
-use ZipArchive;
 use RuntimeException;
+use ZipArchive;
 
 class SuperAdminBackupService
 {
     /**
+     * Tables that should not be included in a recovery backup.
+     */
+    private array $excludedTables = [
+        'password_reset_tokens',
+        'personal_access_tokens',
+    ];
+
+    /**
      * Create a complete ANI-CARE recovery backup.
+     *
+     * This version does NOT use:
+     * - exec()
+     * - mysqldump
+     * - mysql.exe
+     *
+     * Therefore it works on hosting environments where shell
+     * execution is disabled.
      */
     public function create(): array
     {
@@ -29,17 +46,15 @@ class SuperAdminBackupService
         File::ensureDirectoryExists($backupDir);
 
         try {
-
             /*
             |--------------------------------------------------------------------------
-            | 1. CREATE DATABASE.SQL
+            | 1. CREATE DATABASE SNAPSHOT
             |--------------------------------------------------------------------------
             */
 
-            $sqlPath = $workDir . '/database.sql';
+            $databasePath = $workDir . '/database.json';
 
-            $this->createSqlDump($sqlPath);
-
+            $this->createDatabaseSnapshot($databasePath);
 
             /*
             |--------------------------------------------------------------------------
@@ -52,53 +67,78 @@ class SuperAdminBackupService
                 $workDir . '/storage/app/public'
             );
 
+            /*
+            |--------------------------------------------------------------------------
+            | 3. COPY PUBLIC UPLOADS
+            |--------------------------------------------------------------------------
+            */
+
             $this->copyDirectoryIfExists(
                 public_path('uploads'),
                 $workDir . '/public/uploads'
             );
 
-
             /*
             |--------------------------------------------------------------------------
-            | 3. CREATE MANIFEST
+            | 4. CREATE MANIFEST
             |--------------------------------------------------------------------------
             */
 
             File::put(
                 $workDir . '/manifest.json',
-                json_encode([
-                    'backup_format' => 'ANI-CARE Super Admin SQL Backup v2',
+                json_encode(
+                    [
+                        'backup_format' =>
+                            'ANI-CARE Super Admin PHP Backup v4',
 
-                    'created_at' => now()->toIso8601String(),
+                        'created_at' =>
+                            now()->toIso8601String(),
 
-                    'application' => config('app.name'),
+                        'application' =>
+                            config('app.name'),
 
-                    'laravel_version' => app()->version(),
+                        'laravel_version' =>
+                            app()->version(),
 
-                    'php_version' => PHP_VERSION,
+                        'php_version' =>
+                            PHP_VERSION,
 
-                    'database' => DB::getDatabaseName(),
+                        'database_driver' =>
+                            DB::getDriverName(),
 
-                    'included' => [
-                        'database.sql',
-                        'storage/app/public',
-                        'public/uploads',
+                        'database' =>
+                            DB::getDatabaseName(),
+
+                        'included' => [
+                            'database.json',
+                            'storage/app/public',
+                            'public/uploads',
+                        ],
+
+                        'excluded' => [
+                            '.env',
+                            'application secrets',
+                            'password_reset_tokens',
+                            'personal_access_tokens',
+                        ],
+
+                        'notes' => [
+                            'Database backup is generated using Laravel/PHP.',
+                            'No shell commands are required.',
+                            'No mysqldump executable is required.',
+                            'No mysql executable is required.',
+                            'Database structure and table data are included.',
+                        ],
                     ],
-
-                    'excluded' => [
-                        '.env',
-                        'application secrets',
-                        'password_reset_tokens',
-                        'personal_access_tokens',
-                    ],
-
-                ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
+                    JSON_PRETTY_PRINT |
+                    JSON_UNESCAPED_UNICODE |
+                    JSON_UNESCAPED_SLASHES
+                )
             );
-
 
             /*
             |--------------------------------------------------------------------------
-            | 4. CREATE ZIP
+            | 5. CREATE ZIP
             |--------------------------------------------------------------------------
             */
 
@@ -113,7 +153,8 @@ class SuperAdminBackupService
             if (
                 $zip->open(
                     $zipPath,
-                    ZipArchive::CREATE | ZipArchive::OVERWRITE
+                    ZipArchive::CREATE |
+                    ZipArchive::OVERWRITE
                 ) !== true
             ) {
                 throw new RuntimeException(
@@ -129,23 +170,37 @@ class SuperAdminBackupService
 
             $zip->close();
 
+            /*
+            |--------------------------------------------------------------------------
+            | 6. VERIFY ZIP
+            |--------------------------------------------------------------------------
+            */
+
+            if (
+                !File::exists($zipPath) ||
+                File::size($zipPath) <= 0
+            ) {
+                throw new RuntimeException(
+                    'Backup ZIP was created but is empty.'
+                );
+            }
 
             /*
             |--------------------------------------------------------------------------
-            | 5. RETURN BACKUP INFORMATION
+            | 7. RETURN BACKUP INFORMATION
             |--------------------------------------------------------------------------
             */
 
             return [
                 'path' => $zipPath,
 
-                'filename' => basename($zipPath),
+                'filename' =>
+                    basename($zipPath),
 
-                'size' => File::size($zipPath),
+                'size' =>
+                    File::size($zipPath),
             ];
-
         } finally {
-
             /*
             |--------------------------------------------------------------------------
             | DELETE TEMPORARY WORK DIRECTORY
@@ -158,10 +213,18 @@ class SuperAdminBackupService
 
 
     /**
-     * Restore an ANI-CARE SQL backup ZIP.
+     * Restore an ANI-CARE PHP backup ZIP.
+     *
+     * No exec(), mysql.exe, or mysqldump is required.
      */
     public function restore(string $zipPath): array
     {
+        if (!File::exists($zipPath)) {
+            throw new RuntimeException(
+                'The backup file does not exist.'
+            );
+        }
+
         $workDir = storage_path(
             'app/private/super-admin-work/' . Str::uuid()
         );
@@ -177,14 +240,12 @@ class SuperAdminBackupService
         */
 
         if ($zip->open($zipPath) !== true) {
-
             File::deleteDirectory($workDir);
 
             throw new RuntimeException(
                 'The uploaded backup is not a valid ZIP archive.'
             );
         }
-
 
         /*
         |--------------------------------------------------------------------------
@@ -193,7 +254,6 @@ class SuperAdminBackupService
         */
 
         if (!$zip->extractTo($workDir)) {
-
             $zip->close();
 
             File::deleteDirectory($workDir);
@@ -205,12 +265,10 @@ class SuperAdminBackupService
 
         $zip->close();
 
-
         try {
-
             /*
             |--------------------------------------------------------------------------
-            | 3. VERIFY BACKUP FILES
+            | 3. VERIFY REQUIRED FILES
             |--------------------------------------------------------------------------
             */
 
@@ -218,22 +276,21 @@ class SuperAdminBackupService
                 $workDir . '/manifest.json';
 
             $databasePath =
-                $workDir . '/database.sql';
-
+                $workDir . '/database.json';
 
             if (
                 !File::exists($manifestPath) ||
                 !File::exists($databasePath)
             ) {
                 throw new RuntimeException(
-                    'Invalid ANI-CARE backup. manifest.json or database.sql is missing.'
+                    'Invalid ANI-CARE backup. ' .
+                    'manifest.json or database.json is missing.'
                 );
             }
 
-
             /*
             |--------------------------------------------------------------------------
-            | 4. VERIFY MANIFEST
+            | 4. READ MANIFEST
             |--------------------------------------------------------------------------
             */
 
@@ -248,16 +305,14 @@ class SuperAdminBackupService
                 );
             }
 
-
             $backupFormat =
                 $manifest['backup_format'] ?? null;
-
 
             if (
                 !is_string($backupFormat) ||
                 !str_starts_with(
                     $backupFormat,
-                    'ANI-CARE Super Admin SQL Backup'
+                    'ANI-CARE Super Admin PHP Backup'
                 )
             ) {
                 throw new RuntimeException(
@@ -265,21 +320,20 @@ class SuperAdminBackupService
                 );
             }
 
-
             /*
             |--------------------------------------------------------------------------
             | 5. RESTORE DATABASE
             |--------------------------------------------------------------------------
             */
 
-            $this->restoreSqlDump(
-                $databasePath
-            );
-
+            $restoreResult =
+                $this->restoreDatabaseSnapshot(
+                    $databasePath
+                );
 
             /*
             |--------------------------------------------------------------------------
-            | 6. RESTORE UPLOADED FILES
+            | 6. RESTORE STORAGE FILES
             |--------------------------------------------------------------------------
             */
 
@@ -288,31 +342,40 @@ class SuperAdminBackupService
                 storage_path('app/public')
             );
 
+            /*
+            |--------------------------------------------------------------------------
+            | 7. RESTORE UPLOADS
+            |--------------------------------------------------------------------------
+            */
 
             $this->restoreDirectoryIfExists(
                 $workDir . '/public/uploads',
                 public_path('uploads')
             );
 
-
             /*
             |--------------------------------------------------------------------------
-            | 7. RETURN RESULT
+            | 8. RETURN RESULT
             |--------------------------------------------------------------------------
             */
 
             return [
-                'restored_rows' => null,
+                'restored_rows' =>
+                    $restoreResult['restored_rows'],
 
-                'skipped_tables' => 0,
+                'skipped_tables' =>
+                    $restoreResult['skipped_tables'],
 
-                'database_restored' => true,
+                'restored_tables' =>
+                    $restoreResult['restored_tables'],
 
-                'files_restored' => true,
+                'database_restored' =>
+                    true,
+
+                'files_restored' =>
+                    true,
             ];
-
         } finally {
-
             /*
             |--------------------------------------------------------------------------
             | DELETE TEMPORARY RESTORE DIRECTORY
@@ -325,281 +388,476 @@ class SuperAdminBackupService
 
 
     /**
-     * Create an actual MySQL SQL dump.
+     * Create a PHP/Laravel database snapshot.
+     *
+     * The snapshot contains:
+     *
+     * - table name
+     * - CREATE TABLE statement
+     * - table rows
      */
-    private function createSqlDump(string $sqlPath): void
-    {
-        $host =
-            config('database.connections.mysql.host');
+    private function createDatabaseSnapshot(
+        string $databasePath
+    ): void {
+        $driver = DB::getDriverName();
 
-        $port =
-            config('database.connections.mysql.port');
-
-        $database =
-            config('database.connections.mysql.database');
-
-        $username =
-            config('database.connections.mysql.username');
-
-        $password =
-            config('database.connections.mysql.password');
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | XAMPP mysqldump
-        |--------------------------------------------------------------------------
-        */
-
-        $mysqldump =
-            'C:\\xampp\\mysql\\bin\\mysqldump.exe';
-
-
-        if (!File::exists($mysqldump)) {
-
+        if ($driver !== 'mysql') {
             throw new RuntimeException(
-                'mysqldump.exe was not found at: ' .
-                $mysqldump
+                'The Super Admin PHP backup currently supports MySQL/MariaDB only.'
             );
         }
 
-
         /*
         |--------------------------------------------------------------------------
-        | Tables that must NOT be included in backup
-        |--------------------------------------------------------------------------
-        |
-        | These may contain temporary authentication/security data.
-        |
-        */
-
-        $ignoredTables = [
-            'password_reset_tokens',
-            'personal_access_tokens',
-        ];
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Build ignored-table options
+        | Get all base tables
         |--------------------------------------------------------------------------
         */
 
-        $ignoreOptions = '';
-
-        foreach ($ignoredTables as $table) {
-
-            $ignoreOptions .=
-                ' --ignore-table=' .
-                escapeshellarg(
-                    $database . '.' . $table
-                );
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Build mysqldump command
-        |--------------------------------------------------------------------------
-        */
-
-        $command =
-            '"' . $mysqldump . '"' .
-
-            ' --host=' .
-            escapeshellarg($host) .
-
-            ' --port=' .
-            escapeshellarg($port) .
-
-            ' --user=' .
-            escapeshellarg($username) .
-
-            ' --password=' .
-            escapeshellarg($password) .
-
-            ' --single-transaction' .
-
-            ' --routines' .
-
-            ' --triggers' .
-
-            ' --events' .
-
-            ' --default-character-set=utf8mb4' .
-
-            $ignoreOptions .
-
-            ' ' .
-            escapeshellarg($database) .
-
-            ' > ' .
-            escapeshellarg($sqlPath);
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Execute mysqldump
-        |--------------------------------------------------------------------------
-        */
-
-        $output = [];
-
-        $exitCode = 0;
-
-        exec(
-            $command . ' 2>&1',
-            $output,
-            $exitCode
+        $tables = DB::select(
+            'SHOW FULL TABLES WHERE Table_type = ?',
+            ['BASE TABLE']
         );
 
+        $snapshot = [
+            'format' =>
+                'ANI-CARE Database Snapshot v1',
+
+            'created_at' =>
+                now()->toIso8601String(),
+
+            'database' =>
+                DB::getDatabaseName(),
+
+            'driver' =>
+                $driver,
+
+            'tables' => [],
+        ];
+
+        foreach ($tables as $tableRow) {
+            $tableName = $this->extractTableName(
+                $tableRow
+            );
+
+            if ($tableName === null) {
+                continue;
+            }
+
+            if (
+                in_array(
+                    $tableName,
+                    $this->excludedTables,
+                    true
+                )
+            ) {
+                continue;
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | Get CREATE TABLE
+            |--------------------------------------------------------------------------
+            */
+
+            $createResult = DB::select(
+                'SHOW CREATE TABLE ' .
+                $this->quoteIdentifier($tableName)
+            );
+
+            if (empty($createResult)) {
+                continue;
+            }
+
+            $createRow = (array) $createResult[0];
+
+            $createSql = null;
+
+            foreach ($createRow as $key => $value) {
+                if (
+                    str_contains(
+                        strtolower((string) $key),
+                        'create table'
+                    )
+                ) {
+                    $createSql = $value;
+                    break;
+                }
+            }
+
+            if (
+                !is_string($createSql) ||
+                trim($createSql) === ''
+            ) {
+                continue;
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | Get table data
+            |--------------------------------------------------------------------------
+            */
+
+            $rows = DB::table($tableName)
+                ->get()
+                ->map(
+                    fn ($row) => (array) $row
+                )
+                ->values()
+                ->all();
+
+            $snapshot['tables'][] = [
+                'name' =>
+                    $tableName,
+
+                'create_sql' =>
+                    $createSql,
+
+                'row_count' =>
+                    count($rows),
+
+                'rows' =>
+                    $rows,
+            ];
+        }
 
         /*
         |--------------------------------------------------------------------------
-        | Check result
+        | Write snapshot
         |--------------------------------------------------------------------------
         */
 
-        if ($exitCode !== 0) {
+        $json = json_encode(
+            $snapshot,
+            JSON_PRETTY_PRINT |
+            JSON_UNESCAPED_UNICODE |
+            JSON_UNESCAPED_SLASHES
+        );
 
+        if ($json === false) {
             throw new RuntimeException(
-                'Database SQL backup failed: ' .
-                implode(PHP_EOL, $output)
+                'Unable to encode database backup: ' .
+                json_last_error_msg()
             );
         }
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | Verify SQL file
-        |--------------------------------------------------------------------------
-        */
+        if (!File::put($databasePath, $json)) {
+            throw new RuntimeException(
+                'Unable to write database backup file.'
+            );
+        }
 
         if (
-            !File::exists($sqlPath) ||
-            File::size($sqlPath) === 0
+            !File::exists($databasePath) ||
+            File::size($databasePath) <= 0
         ) {
             throw new RuntimeException(
-                'Database SQL backup was created but is empty.'
+                'Database backup file was created but is empty.'
             );
         }
     }
 
 
     /**
-     * Restore SQL dump into the configured MySQL database.
+     * Restore the PHP/Laravel database snapshot.
      */
-    private function restoreSqlDump(string $sqlPath): void
-    {
-        $host =
-            config('database.connections.mysql.host');
-
-        $port =
-            config('database.connections.mysql.port');
-
-        $database =
-            config('database.connections.mysql.database');
-
-        $username =
-            config('database.connections.mysql.username');
-
-        $password =
-            config('database.connections.mysql.password');
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | XAMPP mysql.exe
-        |--------------------------------------------------------------------------
-        */
-
-        $mysql =
-            'C:\\xampp\\mysql\\bin\\mysql.exe';
-
-
-        if (!File::exists($mysql)) {
-
+    private function restoreDatabaseSnapshot(
+        string $databasePath
+    ): array {
+        if (!File::exists($databasePath)) {
             throw new RuntimeException(
-                'mysql.exe was not found at: ' .
-                $mysql
+                'Database snapshot file does not exist.'
             );
         }
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | Verify SQL file
-        |--------------------------------------------------------------------------
-        */
-
-        if (
-            !File::exists($sqlPath) ||
-            File::size($sqlPath) === 0
-        ) {
-            throw new RuntimeException(
-                'The database.sql file is missing or empty.'
-            );
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Build restore command
-        |--------------------------------------------------------------------------
-        */
-
-        $command =
-            '"' . $mysql . '"' .
-
-            ' --host=' .
-            escapeshellarg($host) .
-
-            ' --port=' .
-            escapeshellarg($port) .
-
-            ' --user=' .
-            escapeshellarg($username) .
-
-            ' --password=' .
-            escapeshellarg($password) .
-
-            ' ' .
-            escapeshellarg($database) .
-
-            ' < ' .
-            escapeshellarg($sqlPath);
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Execute MySQL restore
-        |--------------------------------------------------------------------------
-        */
-
-        $output = [];
-
-        $exitCode = 0;
-
-        exec(
-            $command . ' 2>&1',
-            $output,
-            $exitCode
+        $contents = File::get(
+            $databasePath
         );
 
+        $snapshot = json_decode(
+            $contents,
+            true
+        );
+
+        if (!is_array($snapshot)) {
+            throw new RuntimeException(
+                'Database snapshot is invalid JSON.'
+            );
+        }
+
+        if (
+            ($snapshot['format'] ?? null) !==
+            'ANI-CARE Database Snapshot v1'
+        ) {
+            throw new RuntimeException(
+                'Unsupported database snapshot format.'
+            );
+        }
+
+        if (
+            !isset($snapshot['tables']) ||
+            !is_array($snapshot['tables'])
+        ) {
+            throw new RuntimeException(
+                'Database snapshot contains no table definitions.'
+            );
+        }
 
         /*
         |--------------------------------------------------------------------------
-        | Check restore result
+        | Current database
         |--------------------------------------------------------------------------
         */
 
-        if ($exitCode !== 0) {
+        $driver = DB::getDriverName();
 
+        if ($driver !== 'mysql') {
             throw new RuntimeException(
-                'Database SQL restore failed: ' .
-                implode(PHP_EOL, $output)
+                'Database restore currently supports MySQL/MariaDB only.'
             );
         }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Count tables
+        |--------------------------------------------------------------------------
+        */
+
+        $restoredTables = 0;
+        $skippedTables = 0;
+        $restoredRows = 0;
+
+        /*
+        |--------------------------------------------------------------------------
+        | Disable foreign key checks
+        |--------------------------------------------------------------------------
+        */
+
+        DB::statement(
+            'SET FOREIGN_KEY_CHECKS=0'
+        );
+
+        try {
+            /*
+            |--------------------------------------------------------------------------
+            | IMPORTANT:
+            | Drop tables first.
+            |--------------------------------------------------------------------------
+            */
+
+            foreach ($snapshot['tables'] as $table) {
+                $tableName =
+                    $table['name'] ?? null;
+
+                if (
+                    !is_string($tableName) ||
+                    $tableName === ''
+                ) {
+                    $skippedTables++;
+                    continue;
+                }
+
+                if (
+                    in_array(
+                        $tableName,
+                        $this->excludedTables,
+                        true
+                    )
+                ) {
+                    $skippedTables++;
+                    continue;
+                }
+
+                DB::statement(
+                    'DROP TABLE IF EXISTS ' .
+                    $this->quoteIdentifier(
+                        $tableName
+                    )
+                );
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | Recreate tables
+            |--------------------------------------------------------------------------
+            */
+
+            foreach ($snapshot['tables'] as $table) {
+                $tableName =
+                    $table['name'] ?? null;
+
+                $createSql =
+                    $table['create_sql'] ?? null;
+
+                if (
+                    !is_string($tableName) ||
+                    $tableName === '' ||
+                    !is_string($createSql) ||
+                    trim($createSql) === ''
+                ) {
+                    $skippedTables++;
+                    continue;
+                }
+
+                if (
+                    in_array(
+                        $tableName,
+                        $this->excludedTables,
+                        true
+                    )
+                ) {
+                    $skippedTables++;
+                    continue;
+                }
+
+                /*
+                |--------------------------------------------------------------------------
+                | Create table
+                |--------------------------------------------------------------------------
+                */
+
+                DB::statement(
+                    $createSql
+                );
+
+                $restoredTables++;
+
+                /*
+                |--------------------------------------------------------------------------
+                | Restore rows
+                |--------------------------------------------------------------------------
+                */
+
+                $rows =
+                    $table['rows'] ?? [];
+
+                if (
+                    !is_array($rows) ||
+                    empty($rows)
+                ) {
+                    continue;
+                }
+
+                foreach (
+                    array_chunk($rows, 500)
+                    as $chunk
+                ) {
+                    $insertRows = [];
+
+                    foreach ($chunk as $row) {
+                        if (is_array($row)) {
+                            $insertRows[] = $row;
+                        }
+                    }
+
+                    if (empty($insertRows)) {
+                        continue;
+                    }
+
+                    DB::table($tableName)
+                        ->insert($insertRows);
+
+                    $restoredRows +=
+                        count($insertRows);
+                }
+            }
+        } catch (\Throwable $e) {
+            throw new RuntimeException(
+                'Database restore failed: ' .
+                $e->getMessage(),
+                0,
+                $e
+            );
+        } finally {
+            /*
+            |--------------------------------------------------------------------------
+            | ALWAYS RE-ENABLE FOREIGN KEYS
+            |--------------------------------------------------------------------------
+            */
+
+            DB::statement(
+                'SET FOREIGN_KEY_CHECKS=1'
+            );
+        }
+
+        return [
+            'restored_rows' =>
+                $restoredRows,
+
+            'restored_tables' =>
+                $restoredTables,
+
+            'skipped_tables' =>
+                $skippedTables,
+        ];
+    }
+
+
+    /**
+     * Extract table name from SHOW FULL TABLES result.
+     */
+    private function extractTableName(
+        object $tableRow
+    ): ?string {
+        $data = (array) $tableRow;
+
+        foreach ($data as $key => $value) {
+            if (
+                str_ends_with(
+                    strtolower((string) $key),
+                    'tables_in_' .
+                    strtolower(DB::getDatabaseName())
+                )
+            ) {
+                return is_string($value)
+                    ? $value
+                    : null;
+            }
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Fallback:
+        | The first column is normally the table name.
+        |--------------------------------------------------------------------------
+        */
+
+        $values = array_values($data);
+
+        if (
+            isset($values[0]) &&
+            is_string($values[0])
+        ) {
+            return $values[0];
+        }
+
+        return null;
+    }
+
+
+    /**
+     * Safely quote a MySQL identifier.
+     */
+    private function quoteIdentifier(
+        string $identifier
+    ): string {
+        if (
+            !preg_match(
+                '/^[A-Za-z0-9_$]+$/',
+                $identifier
+            )
+        ) {
+            throw new RuntimeException(
+                'Invalid database identifier.'
+            );
+        }
+
+        return '`' .
+            str_replace(
+                '`',
+                '``',
+                $identifier
+            ) .
+            '`';
     }
 
 
@@ -610,14 +868,18 @@ class SuperAdminBackupService
         string $source,
         string $destination
     ): void {
-
-        if (File::isDirectory($source)) {
-
-            File::copyDirectory(
-                $source,
-                $destination
-            );
+        if (!File::isDirectory($source)) {
+            return;
         }
+
+        File::ensureDirectoryExists(
+            $destination
+        );
+
+        File::copyDirectory(
+            $source,
+            $destination
+        );
     }
 
 
@@ -628,7 +890,6 @@ class SuperAdminBackupService
         string $source,
         string $destination
     ): void {
-
         if (!File::isDirectory($source)) {
             return;
         }
@@ -652,13 +913,11 @@ class SuperAdminBackupService
         string $directory,
         string $prefix
     ): void {
-
         $files = File::allFiles(
             $directory
         );
 
         foreach ($files as $file) {
-
             $relative = ltrim(
                 str_replace(
                     $directory,
